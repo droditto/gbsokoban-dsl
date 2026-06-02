@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: com.drodo.gbsokoban
+Bundle-ManifestVersion: 2
+Bundle-Name: com.drodo.gbsokoban
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: com.drodo.gbsokoban; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.19.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.41.0",
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)",
+ org.eclipse.core.resources;bundle-version="3.23.100"
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Export-Package: com.drodo.gbsokoban.generator,
+ com.drodo.gbsokoban.scoping,
+ com.drodo.gbsokoban,
+ com.drodo.gbsokoban.parser.antlr,
+ com.drodo.gbsokoban.gBSokoban,
+ com.drodo.gbsokoban.serializer,
+ com.drodo.gbsokoban.gBSokoban.impl,
+ com.drodo.gbsokoban.gBSokoban.util,
+ com.drodo.gbsokoban.util,
+ com.drodo.gbsokoban.validation,
+ com.drodo.gbsokoban.parser.antlr.internal,
+ com.drodo.gbsokoban.services
+Import-Package: org.apache.log4j

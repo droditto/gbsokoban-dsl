@@ -1,0 +1,149 @@
+grammar com.drodo.gbsokoban.GBSokoban with org.eclipse.xtext.common.Terminals
+
+generate gBSokoban "http://www.drodo.com/gbsokoban/GBSokoban"
+
+// ==== Game ====
+
+Game:
+	'game' name=ID '{'
+		(('gbdk' gbdk=STRING)? &
+		'tileSheet' tileSheet=STRING &
+		'spriteSheet' spriteSheet=STRING &
+		('titleScreen' titleScreen=STRING)? &
+		('endingScreen' endingScreen=STRING)? &
+		('movementSpeed' movementSpeed=INT)? &
+		('animationSpeed' animationSpeed=INT)? &
+		(disableLevelSelect?='disableLevelSelect')?)
+		palette=PaletteBlock?
+		sounds=SoundBlock?
+		tiles=TilesBlock
+		objects=ObjectsBlock?
+		player=PlayerDef
+		legend=LegendBlock
+		win=WinBlock
+		levels=LevelsBlock
+	'}';
+
+// ==== Palette ====
+
+PaletteBlock:
+	'palette' '{' entries+=PaletteEntry+ '}';
+
+PaletteEntry:
+	register=PaletteRegister
+	'[' colors+=DmgColor ',' colors+=DmgColor ',' colors+=DmgColor ',' colors+=DmgColor ']';
+
+enum PaletteRegister: BGP | OBP0 | OBP1;
+enum DmgColor: DMG_WHITE | DMG_LITE_GRAY | DMG_DARK_GRAY | DMG_BLACK;
+
+// ==== Tiles ====
+
+TilesBlock:
+	{TilesBlock} 'tiles' '{' entries+=TileDef+ '}';
+
+TileDef:
+	'tile' name=ID char=STRING '{'
+		('tileIdx' tileIdx=INT &
+		type=TileType?)
+	'}';
+
+TileType:
+	SolidTile | IceTile | DeadlyTile | CrumbleTile | FillableTile | ConveyorTile;
+
+SolidTile: {SolidTile} 'solid';
+IceTile: {IceTile} 'ice';
+DeadlyTile: {DeadlyTile} 'deadly';
+CrumbleTile: 'crumble' 'into' collapseTile=[TileDef];
+FillableTile: 'fillable' 'into' filledTile=[TileDef];
+ConveyorTile: 'conveyor' direction=Direction;
+
+// ==== Objects ====
+
+ObjectsBlock:
+	{ObjectsBlock} 'objects' '{' entries+=ObjectDef+ '}';
+
+ObjectDef:
+	'object' name=ID char=STRING '{'
+		(('objectPalette' objectPalette=ObjectPalette)? &
+		'tileIdx' tileIdx=INT &
+		'spriteIdx' spriteIdx=INT &
+		('onGoal' onGoalTileIdx=INT)?)
+	'}';
+
+enum ObjectPalette: OBP0 | OBP1;
+
+// ==== Player ====
+
+PlayerDef:
+	'player' (canPull?='canPull')? '{'
+		(('objectPalette' objectPalette=ObjectPalette)? &
+		'walk' walk=AnimBlock &
+		('push' push=AnimBlock)? &
+		('pull' pull=AnimBlock)?)
+	'}';
+
+AnimBlock:
+	'{'
+		'up' up=DirAnim
+		'down' down=DirAnim
+		'left' left=DirAnim
+		'right' right=DirAnim
+	'}';
+
+DirAnim: FrameList | FlipAnim;
+FrameList: '[' frames+=INT (',' frames+=INT)* ']';
+FlipAnim: (flipX?='flipX' | flipY?='flipY') source=Direction;
+enum Direction: down | up | left | right;
+
+// ==== Legend ====
+
+LegendBlock:
+	{LegendBlock} 'legend' '{' entries+=LegendEntry+ '}';
+
+LegendEntry:
+	char=STRING '=' entity=Subject 'on' tile=[TileDef];
+
+Subject: PlayerRef | ObjectRef;
+PlayerRef: {PlayerRef} 'Player';
+ObjectRef: ref=[ObjectDef];
+
+// ==== Win ====
+
+WinBlock:
+	{WinBlock} 'win' '{' conditions+=WinCondition+ '}';
+
+WinCondition: AllOn | SomeOn | NoEntity;
+AllOn: 'all' subject=Subject 'on' tile=[TileDef];
+SomeOn: 'some' subject=Subject 'on' tile=[TileDef];
+NoEntity: 'no' entity=[Entity];
+
+Entity: TileDef | ObjectDef;
+
+// ==== Sounds ====
+
+SoundBlock:
+	{SoundBlock} 'sounds' '{'
+		(('playerMove' playerMove = SoundSpec)? &
+		('playerBlocked' playerBlocked = SoundSpec)? &
+		('boxPush' boxPush = SoundSpec)? &
+		('boxOnGoal' boxOnGoal = SoundSpec)? &
+		('boxDestroyed' boxDestroyed = SoundSpec)? &
+		('levelComplete' levelComplete = SoundSpec)? &
+		('levelRestart' levelRestart = SoundSpec)? &
+		('crumble' crumble = SoundSpec)? &
+		('menuMove' menuMove = SoundSpec)? &
+		('menuSelect' menuSelect = SoundSpec)?)
+	'}';
+
+SoundSpec:
+	'{' channel=SoundChannel r0=INT r1=INT r2=INT r3=INT r4=INT '}';
+
+enum SoundChannel: NR1 | NR2 | NR3 | NR4;
+
+// ==== Levels ====
+
+LevelsBlock:
+	{LevelsBlock} 'levels' '{' levels+=Level+ '}';
+
+Level:
+	'level' '{' rows+=STRING+ '}';

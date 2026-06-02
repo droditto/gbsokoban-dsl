@@ -1,0 +1,36 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: com.drodo.gbsokoban.ui
+Bundle-ManifestVersion: 2
+Bundle-Name: com.drodo.gbsokoban.ui
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: com.drodo.gbsokoban.ui; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: com.drodo.gbsokoban,
+ com.drodo.gbsokoban.ide,
+ org.eclipse.xtext.ui,
+ org.eclipse.xtext.ui.shared,
+ org.eclipse.xtext.ui.codetemplates.ui,
+ org.eclipse.ui.editors;bundle-version="3.14.300",
+ org.eclipse.ui.ide;bundle-version="3.18.500",
+ org.eclipse.ui,
+ org.eclipse.compare,
+ org.eclipse.xtext.builder,
+ org.eclipse.core.runtime,
+ org.eclipse.core.jobs
+Import-Package: org.apache.log4j
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Export-Package: com.drodo.gbsokoban.ui.quickfix,
+ com.drodo.gbsokoban.ui.internal,
+ com.drodo.gbsokoban.ui.contentassist
+Bundle-Activator: com.drodo.gbsokoban.ui.internal.GbsokobanActivator
+Bundle-ClassPath: .,
+ lib/langchain4j-1.7.1.jar,
+ lib/langchain4j-core-1.7.1.jar,
+ lib/langchain4j-open-ai-1.7.1.jar,
+ lib/langchain4j-http-client-1.7.1.jar,
+ lib/langchain4j-http-client-jdk-1.7.1.jar,
+ lib/jackson-annotations-2.17.3.jar,
+ lib/jackson-core-2.17.0.jar,
+ lib/jackson-databind-2.17.0.jar,
+ lib/slf4j-api-2.0.17.jar

@@ -1,0 +1,9 @@
+.metadata/
+.launch/
+.DS_Store
+bin/
+src-gen/
+xtend-gen/
+test-bin/
+**/model/generated/
+.antlr-generator-3.2.0-patch.jar
