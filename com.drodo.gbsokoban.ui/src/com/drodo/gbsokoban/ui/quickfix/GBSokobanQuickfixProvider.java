@@ -1,267 +1,242 @@
 package com.drodo.gbsokoban.ui.quickfix;
 
-import static com.drodo.gbsokoban.util.ModelHelpers.legendEntriesOf;
-import static com.drodo.gbsokoban.util.ModelHelpers.tilesOf;
-
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.ui.editor.model.edit.ISemanticModification;
+import org.eclipse.emf.ecore.EObject;
+import java.util.ArrayList;
+import java.util.function.BiFunction;
+
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
+import org.eclipse.xtext.ui.editor.model.edit.IModificationContext;
+import org.eclipse.xtext.ui.editor.model.IXtextDocument;
+import org.eclipse.xtext.ui.editor.model.edit.IModification;
 import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider;
 import org.eclipse.xtext.ui.editor.quickfix.Fix;
 import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor;
 import org.eclipse.xtext.validation.Issue;
 
-import com.drodo.gbsokoban.gBSokoban.Entity;
-import com.drodo.gbsokoban.gBSokoban.GBSokobanFactory;
-import com.drodo.gbsokoban.gBSokoban.GBSokobanPackage;
 import com.drodo.gbsokoban.gBSokoban.Game;
 import com.drodo.gbsokoban.gBSokoban.LegendEntry;
-import com.drodo.gbsokoban.gBSokoban.Level;
-import com.drodo.gbsokoban.gBSokoban.ObjectDef;
-import com.drodo.gbsokoban.gBSokoban.ObjectRef;
-import com.drodo.gbsokoban.gBSokoban.PlayerDef;
 import com.drodo.gbsokoban.gBSokoban.PlayerRef;
-import com.drodo.gbsokoban.gBSokoban.SolidTile;
+import com.drodo.gbsokoban.gBSokoban.Solid;
+import com.drodo.gbsokoban.gBSokoban.Texture;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
-import com.drodo.gbsokoban.util.CharPool;
+import com.drodo.gbsokoban.model.GameTextures;
+import com.drodo.gbsokoban.model.SymbolPool;
+import com.drodo.gbsokoban.util.CellGeometry;
+import com.drodo.gbsokoban.util.Palettes;
 import com.drodo.gbsokoban.validation.GBSokobanValidator;
 
 public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
-	@Fix(GBSokobanValidator.ISSUE_TILE_SHEET_NO_PNG)
-	public void fixTileSheetExtension(Issue issue, IssueResolutionAcceptor acceptor) {
-		appendPng(issue, acceptor, GBSokobanPackage.Literals.GAME__TILE_SHEET);
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_SPRITE_SHEET_NO_PNG)
-	public void fixSpriteSheetExtension(Issue issue, IssueResolutionAcceptor acceptor) {
-		appendPng(issue, acceptor, GBSokobanPackage.Literals.GAME__SPRITE_SHEET);
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_TITLE_SCREEN_NO_PNG)
-	public void fixTitleScreenExtension(Issue issue, IssueResolutionAcceptor acceptor) {
-		appendPng(issue, acceptor, GBSokobanPackage.Literals.GAME__TITLE_SCREEN);
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_ENDING_SCREEN_NO_PNG)
-	public void fixEndingScreenExtension(Issue issue, IssueResolutionAcceptor acceptor) {
-		appendPng(issue, acceptor, GBSokobanPackage.Literals.GAME__ENDING_SCREEN);
-	}
-
-	private void appendPng(Issue issue, IssueResolutionAcceptor acceptor, EAttribute pathFeature) {
-		acceptor.accept(issue,
-				"Append .png extension",
-				"Append .png to the " + pathFeature.getName() + " path.",
-				null,
-				(ISemanticModification) (element, context) -> {
-					if (!(element instanceof Game)) return;
-					Game game = (Game) element;
-					game.eSet(pathFeature, withPngExtension((String) game.eGet(pathFeature)));
+	@Fix(GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL)
+	public void replaceDuplicateSymbol(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Use an available symbol", "Pick a character nothing else uses.", null,
+				(IModification) context -> {
+					IXtextDocument doc = context.getXtextDocument();
+					String free = doc.readOnly(resource -> {
+						EObject host = resource.getEObject(issue.getUriToProblem().fragment());
+						String name = host instanceof TileDef ? ((TileDef) host).getName() : "";
+						return SymbolPool.firstUnusedFor(name,
+								SymbolPool.usedIn((Game) resource.getContents().get(0)));
+					});
+					if (free != null)
+						doc.replace(issue.getOffset(), issue.getLength(), "\"" + free + "\"");
 				});
 	}
 
-	private static String withPngExtension(String path) {
-		if (path == null) return null;
-		if (path.endsWith(".png")) return path;
-		if (path.endsWith(".")) return path + "png";
-		return path + ".png";
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
-	public void fixLegendNoPlayer(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue,
-				"Insert default Player binding",
-				"Add a Player legend entry on the first plain tile.",
-				null,
-				(ISemanticModification) (element, context) -> {
-					if (!(element instanceof Game)) return;
-					Game game = (Game) element;
-					TileDef playerTile = pickPlayerTile(game);
-					if (game.getLegend() == null || playerTile == null) return;
-					LegendEntry entry = GBSokobanFactory.eINSTANCE.createLegendEntry();
-					entry.setChar(pickUnusedChar(game, "Player"));
-					entry.setEntity(GBSokobanFactory.eINSTANCE.createPlayerRef());
-					entry.setTile(playerTile);
-					game.getLegend().getEntries().add(entry);
-				});
-	}
-
-	// Prefer the first plain tile (no type modifier). Fall back to the first declared tile.
-	private static TileDef pickPlayerTile(Game game) {
-		List<TileDef> tiles = tilesOf(game);
-		for (TileDef tile : tiles)
-			if (tile.getType() == null) return tile;
-		return tiles.isEmpty() ? null : tiles.get(0);
-	}
-
-	// Sokoban-style symbols first (proven by the examples), then digits, then alpha.
-	private static final String CHAR_POOL =
-			".#~%*!@?+-^<>0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-	// Pick a letter from the entity name when possible (Floor -> 'F', Player -> 'P').
-	private static String pickUnusedChar(Game game, String preferredName) {
-		Set<String> used = CharPool.usedIn(game);
-		if (preferredName != null)
-			for (int i = 0; i < preferredName.length(); i++) {
-				String upper = String.valueOf(Character.toUpperCase(preferredName.charAt(i)));
-				if (!used.contains(upper)) return upper;
-				String lower = String.valueOf(Character.toLowerCase(preferredName.charAt(i)));
-				if (!used.contains(lower)) return lower;
-			}
-		String fromPool = CharPool.firstUnusedFrom(used, CHAR_POOL);
-		return fromPool != null ? fromPool : "?";
-	}
-
-	// Tile/object => own name; legend entry => the bound entity's name (Player or object).
-	private static String nameOf(EObject element) {
-		if (element instanceof TileDef) return ((TileDef) element).getName();
-		if (element instanceof ObjectDef) return ((ObjectDef) element).getName();
-		if (element instanceof LegendEntry) {
-			EObject bound = ((LegendEntry) element).getEntity();
-			if (bound instanceof PlayerRef) return "Player";
-			if (bound instanceof ObjectRef && ((ObjectRef) bound).getRef() != null)
-				return ((ObjectRef) bound).getRef().getName();
-		}
-		return null;
-	}
-
-	private static String currentChar(EObject element) {
-		if (element instanceof Entity) return ((Entity) element).getChar();
-		if (element instanceof LegendEntry) return ((LegendEntry) element).getChar();
-		return null;
-	}
-
-	private static void setChar(EObject element, String newChar) {
-		if (element instanceof Entity) ((Entity) element).setChar(newChar);
-		else if (element instanceof LegendEntry) ((LegendEntry) element).setChar(newChar);
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_LEVEL_NOT_RECTANGULAR)
-	public void fixLevelNotRectangular(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue,
-				"Pad shorter rows to the maximum width",
-				"Extend each short row on the right by repeating its rightmost character.",
-				null,
-				(ISemanticModification) (element, context) -> {
-					if (!(element instanceof Level)) return;
-					Level level = (Level) element;
-					Game game = EcoreUtil2.getContainerOfType(level, Game.class);
-					Character fallback = (game != null) ? firstTileChar(game) : null;
-					EList<String> rows = level.getRows();
-					int targetWidth = 0;
-					for (String row : rows) targetWidth = Math.max(targetWidth, row.length());
-					for (int i = 0; i < rows.size(); i++) {
-						String row = rows.get(i);
-						if (row.length() < targetWidth) {
-							Character padChar = row.isEmpty() ? fallback : row.charAt(row.length() - 1);
-							StringBuilder padded = new StringBuilder(row);
-							while (padded.length() < targetWidth) padded.append(padChar.charValue());
-							rows.set(i, padded.toString());
-						}
-					}
-				});
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS)
-	public void fixLevelTooManyPlayers(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue,
-				"Keep only the first player position",
-				"Replace every player character after the first with the first passable tile's character.",
-				null,
-				(ISemanticModification) (element, context) -> {
-					if (!(element instanceof Level)) return;
-					Level level = (Level) element;
-					Game game = EcoreUtil2.getContainerOfType(level, Game.class);
-					if (game == null) return;
-					List<String> playerChars = playerCharsOf(game);
-					if (playerChars.isEmpty()) return;
-					Character fillChar = passableFillChar(game);
-					// No passable tile to swap in: leave the level alone rather than inserting walls in its interior.
-					if (fillChar == null) return;
-					EList<String> rows = level.getRows();
-					boolean firstPlayerKept = false;
-					for (int i = 0; i < rows.size(); i++) {
-						StringBuilder rewrittenRow = new StringBuilder(rows.get(i));
-						for (int col = 0; col < rewrittenRow.length(); col++) {
-							String character = String.valueOf(rewrittenRow.charAt(col));
-							if (!playerChars.contains(character)) continue;
-							if (!firstPlayerKept) { firstPlayerKept = true; continue; }
-							rewrittenRow.setCharAt(col, fillChar.charValue());
-						}
-						rows.set(i, rewrittenRow.toString());
-					}
-				});
-	}
-
-	private static List<String> playerCharsOf(Game game) {
-		List<String> playerChars = new ArrayList<>();
-		for (LegendEntry entry : legendEntriesOf(game)) {
-			if (entry.getEntity() instanceof PlayerRef && entry.getChar() != null)
-				playerChars.add(entry.getChar());
-		}
-		return playerChars;
-	}
-
-	/** Character of the first declared tile, or null when no tile has a usable char. */
-	private static Character firstTileChar(Game game) {
-		for (TileDef tile : tilesOf(game))
-			if (tile.getChar() != null && !tile.getChar().isEmpty())
-				return tile.getChar().charAt(0);
-		return null;
-	}
-
-	/** Character of the first non-solid tile. Falls back to firstTileChar, or null when nothing usable exists. */
-	private static Character passableFillChar(Game game) {
-		for (TileDef tile : tilesOf(game))
-			if (!(tile.getType() instanceof SolidTile)
-					&& tile.getChar() != null && !tile.getChar().isEmpty())
-				return tile.getChar().charAt(0);
-		return firstTileChar(game);
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_DUPLICATE_CHAR)
-	public void fixDuplicateChar(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue,
-				"Replace with a character derived from the name",
-				"Use the first letter of the entity's name (or the next free alnum if all are taken).",
-				null,
-				(ISemanticModification) (element, context) -> {
-					Game game = EcoreUtil2.getContainerOfType(element, Game.class);
-					if (game != null) setChar(element, pickUnusedChar(game, nameOf(element)));
-				});
-	}
-
-	@Fix(GBSokobanValidator.ISSUE_CHAR_LENGTH)
-	public void fixCharLength(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue,
-				"Replace with a single character",
-				"If the string is too long, keep its first character. If empty, take the first letter of the entity's name.",
-				null,
-				(ISemanticModification) (element, context) -> {
-					String c = currentChar(element);
-					if (c != null && c.length() > 1) {
-						setChar(element, c.substring(0, 1));
-						return;
-					}
-					Game game = EcoreUtil2.getContainerOfType(element, Game.class);
-					if (game != null) setChar(element, pickUnusedChar(game, nameOf(element)));
+	@Fix(GBSokobanValidator.ISSUE_SYMBOL_LENGTH)
+	public void trimSymbol(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Keep the first character", "A symbol is a single character.", null,
+				(IModification) context -> {
+					IXtextDocument doc = context.getXtextDocument();
+					String inner = doc.get(issue.getOffset(), issue.getLength()).replace("\"", "");
+					if (!inner.isEmpty())
+						doc.replace(issue.getOffset(), issue.getLength(), "\"" + inner.charAt(0) + "\"");
 				});
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL)
-	public void fixPullRequiresCanPull(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue,
-				"Add 'canPull' to the player",
-				"Set the canPull flag so the pull animation is reachable.",
-				null,
-				(ISemanticModification) (element, context) -> {
-					if (element instanceof PlayerDef) ((PlayerDef) element).setCanPull(true);
+	public void allowPulling(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Enable player pull", "Add PLAYER_CAN_PULL to the game options.", null,
+				(IModification) context -> context.getXtextDocument().replace(0, 0, "PLAYER_CAN_PULL\n"));
+	}
+
+	@Fix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
+	public void addPlayerToLegend(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Place the player", "Add a legend entry that puts the player on a plain tile.",
+				null, (IModification) context -> {
+					IXtextDocument doc = context.getXtextDocument();
+					String line = doc.readOnly(resource -> {
+						Game game = (Game) resource.getContents().get(0);
+						TileDef tile = plainTileOf(game);
+						String symbol = SymbolPool.firstUnusedFor(null, SymbolPool.usedIn(game));
+						return tile == null || symbol == null ? null
+								: "\"" + symbol + "\" = PLAYER ON " + tile.getName() + "\n";
+					});
+					if (line != null)
+						doc.replace(issue.getOffset(), 0, line);
 				});
 	}
+
+	@Fix(GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS)
+	public void keepFirstPlayer(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Keep only the first player",
+				"Replace the extra players with a tile they can stand on.", null,
+				(IModification) context -> rewrite(issue, context, (host, text) -> {
+					Game game = EcoreUtil2.getContainerOfType(host, Game.class);
+					Set<String> players = playerSymbolsOf(game);
+					TileDef floor = plainTileOf(game);
+					if (players.isEmpty() || floor == null || floor.getSymbol() == null)
+						return null;
+					char fill = floor.getSymbol().charAt(0);
+					StringBuilder out = new StringBuilder(text);
+					boolean quoted = false;
+					boolean kept = false;
+					for (int i = 0; i < out.length(); i++) {
+						if (out.charAt(i) == '"') {
+							quoted = !quoted;
+						} else if (quoted && players.contains(String.valueOf(out.charAt(i)))) {
+							if (kept)
+								out.setCharAt(i, fill);
+							kept = true;
+						}
+					}
+					return out.toString();
+				}));
+	}
+
+	@Fix(GBSokobanValidator.ISSUE_TEXTURE_SIZE)
+	public void fitTextureToSize(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Fix the texture size", "Pad short rows with transparent and drop the extra ones.",
+				null, (IModification) context -> rewrite(issue, context, (host, text) -> {
+					if (!(host instanceof Texture))
+						return null;
+					int side = sideFor((Texture) host, EcoreUtil2.getContainerOfType(host, Game.class));
+					List<String> lines = new ArrayList<>(List.of(text.split("\n", -1)));
+					int header = 0;
+					while (header < lines.size() && !lines.get(header).contains("USES"))
+						header++;
+					List<String> head = new ArrayList<>(lines.subList(0, header + 1));
+					List<String> rows = new ArrayList<>(lines.subList(header + 1, lines.size()));
+					rows.removeIf(String::isBlank);
+					String indent = rows.isEmpty() ? "" : indentOf(rows.get(0));
+					while (rows.size() > side)
+						rows.remove(rows.size() - 1);
+					for (int y = 0; y < rows.size(); y++)
+						rows.set(y, indent + quoted(fitRow(unquoted(rows.get(y)), side)));
+					while (rows.size() < side)
+						rows.add(indent + quoted(fitRow("", side)));
+					head.addAll(rows);
+					return String.join("\n", head);
+				}));
+	}
+
+	/** Replaces the text of the object the issue points at, computed from what is there now. */
+	private static void rewrite(Issue issue, IModificationContext context,
+			BiFunction<EObject, String, String> edit) throws Exception {
+		IXtextDocument doc = context.getXtextDocument();
+		int[] region = new int[2];
+		String updated = doc.readOnly(resource -> {
+			EObject host = resource.getEObject(issue.getUriToProblem().fragment());
+			ICompositeNode node = host == null ? null : NodeModelUtils.findActualNodeFor(host);
+			if (node == null)
+				return null;
+			region[0] = node.getTotalOffset();
+			region[1] = node.getTotalLength();
+			return edit.apply(host, node.getText());
+		});
+		if (updated != null)
+			doc.replace(region[0], region[1], updated);
+	}
+
+	private static String indentOf(String line) {
+		return line.substring(0, line.length() - line.stripLeading().length());
+	}
+
+	private static String unquoted(String line) {
+		return line.trim().replace("\"", "");
+	}
+
+	private static String quoted(String row) {
+		return "\"" + row + "\"";
+	}
+
+	private static int sideFor(Texture texture, Game game) {
+		int stated = game == null ? 0 : GameTextures.cellPx(game);
+		if (CellGeometry.SUPPORTED_PX.contains(stated))
+			return stated;
+		return CellGeometry.nearestSupportedPx(texture.getRows().size());
+	}
+
+	private static String fitRow(String row, int side) {
+		StringBuilder out = new StringBuilder(row.length() > side ? row.substring(0, side) : row);
+		while (out.length() < side)
+			out.append('.');
+		return out.toString();
+	}
+
+	@Fix(GBSokobanValidator.ISSUE_PALETTE_SIZE)
+	public void fitPaletteToRegister(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Fix the palette size", "Drop the extras or repeat the last one.", null,
+				(IModification) context -> rewrite(issue, context, (host, text) -> {
+					List<String> parts = new ArrayList<>(List.of(text.trim().split("\\s+")));
+					String name = parts.remove(0);
+					if (parts.isEmpty())
+						return null;
+					while (parts.size() > Palettes.ENTRIES)
+						parts.remove(parts.size() - 1);
+					while (parts.size() < Palettes.ENTRIES)
+						parts.add(parts.get(parts.size() - 1));
+					return indentOf(text) + name + " " + String.join(" ", parts);
+				}));
+	}
+
+	@Fix(GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS)
+	public void stopPulling(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Drop PLAYER_CAN_PULL", "Nothing in this game can be pulled.", null,
+				(IModification) context -> {
+					IXtextDocument doc = context.getXtextDocument();
+					deleteLineAt(doc, doc.get().indexOf("PLAYER_CAN_PULL"));
+				});
+	}
+
+	@Fix(GBSokobanValidator.ISSUE_SOUND_NEVER_PLAYS)
+	public void removeUnreachableSound(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Remove the sound", "Nothing in this game can trigger this event.", null,
+				(IModification) context -> deleteLineAt(context.getXtextDocument(), issue.getOffset()));
+	}
+
+	/** Removes the whole line the offset falls on, line break included. */
+	private static void deleteLineAt(IXtextDocument doc, int offset) throws BadLocationException {
+		if (offset < 0)
+			return;
+		int line = doc.getLineOfOffset(offset);
+		doc.replace(doc.getLineOffset(line), doc.getLineLength(line), "");
+	}
+
+	private static TileDef plainTileOf(Game game) {
+		List<TileDef> tiles = game.getTiles();
+		for (TileDef tile : tiles)
+			if (tile.getBehaviour() == null)
+				return tile;
+		for (TileDef tile : tiles)
+			if (!(tile.getBehaviour() instanceof Solid))
+				return tile;
+		return null;
+	}
+
+	private static Set<String> playerSymbolsOf(Game game) {
+		Set<String> symbols = new HashSet<>();
+		for (LegendEntry entry : game.getLegend())
+			if (entry.getSubject() instanceof PlayerRef && entry.getSymbol() != null)
+				symbols.add(entry.getSymbol());
+		return symbols;
+	}
+
 }

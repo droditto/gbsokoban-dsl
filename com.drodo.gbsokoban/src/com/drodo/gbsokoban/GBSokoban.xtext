@@ -1,149 +1,148 @@
 grammar com.drodo.gbsokoban.GBSokoban with org.eclipse.xtext.common.Terminals
+	hidden(WS, ML_COMMENT, SL_COMMENT, SEPARATOR)
 
 generate gBSokoban "http://www.drodo.com/gbsokoban/GBSokoban"
 
-// ==== Game ====
+// =====
+// GAME
+// =====
 
 Game:
-	'game' name=ID '{'
-		(('gbdk' gbdk=STRING)? &
-		'tileSheet' tileSheet=STRING &
-		'spriteSheet' spriteSheet=STRING &
-		('titleScreen' titleScreen=STRING)? &
-		('endingScreen' endingScreen=STRING)? &
-		('movementSpeed' movementSpeed=INT)? &
-		('animationSpeed' animationSpeed=INT)? &
-		(disableLevelSelect?='disableLevelSelect')?)
-		palette=PaletteBlock?
-		sounds=SoundBlock?
-		tiles=TilesBlock
-		objects=ObjectsBlock?
-		player=PlayerDef
-		legend=LegendBlock
-		win=WinBlock
-		levels=LevelsBlock
-	'}';
+	(('TITLE' title=STRING)? &
+	('AUTHOR' author=STRING)? &
+	('MOVE_SPEED' moveSpeed=INT)? &
+	('ANIM_SPEED' animSpeed=INT)? &
+	('ENDING' ending=STRING)? &
+	(canPull?='PLAYER_CAN_PULL')? &
+	(noLevelSelect?='NO_LEVEL_SELECT')?)
+	'PALETTES' palettes+=PaletteDef+
+	'TEXTURES' textures+=Texture+
+	'TILES' tiles+=TileDef+
+	('OBJECTS' objects+=ObjectDef+)?
+	'PLAYER' player=Player
+	'LEGEND' legend+=LegendEntry+
+	'WIN' win+=WinCondition+
+	('SOUNDS' sounds+=Sound+)?
+	'LEVELS' levels+=Level+;
 
-// ==== Palette ====
+// =========
+// PALETTES
+// =========
 
-PaletteBlock:
-	'palette' '{' entries+=PaletteEntry+ '}';
+PaletteDef:
+	name=ID (shades+=DmgShade+ | colors+=RgbColor+);
 
-PaletteEntry:
-	register=PaletteRegister
-	'[' colors+=DmgColor ',' colors+=DmgColor ',' colors+=DmgColor ',' colors+=DmgColor ']';
+enum DmgShade:
+	DMG_WHITE | DMG_LITE_GRAY | DMG_DARK_GRAY | DMG_BLACK;
 
-enum PaletteRegister: BGP | OBP0 | OBP1;
-enum DmgColor: DMG_WHITE | DMG_LITE_GRAY | DMG_DARK_GRAY | DMG_BLACK;
+RgbColor:
+	name=RgbName | hex=HEX;
 
-// ==== Tiles ====
+enum RgbName:
+	RGB_RED | RGB_DARKRED | RGB_GREEN | RGB_DARKGREEN | RGB_BLUE | RGB_DARKBLUE |
+	RGB_YELLOW | RGB_DARKYELLOW | RGB_CYAN | RGB_AQUA | RGB_PINK | RGB_PURPLE |
+	RGB_BLACK | RGB_DARKGRAY | RGB_LIGHTGRAY | RGB_WHITE | RGB_LIGHTFLESH |
+	RGB_BROWN | RGB_ORANGE | RGB_TEAL;
 
-TilesBlock:
-	{TilesBlock} 'tiles' '{' entries+=TileDef+ '}';
+// =========
+// TEXTURES
+// =========
+
+Texture:
+	name=ID 'USES' palette=[PaletteDef]
+	rows+=STRING*;
+
+// ======
+// TILES
+// ======
 
 TileDef:
-	'tile' name=ID char=STRING '{'
-		('tileIdx' tileIdx=INT &
-		type=TileType?)
-	'}';
+	name=ID symbol=STRING 'USES' texture=[Texture] behaviour=TileBehaviour?;
 
-TileType:
-	SolidTile | IceTile | DeadlyTile | CrumbleTile | FillableTile | ConveyorTile;
+TileBehaviour:
+	Solid | Ice | Deadly | Crumble | Fillable | Conveyor;
 
-SolidTile: {SolidTile} 'solid';
-IceTile: {IceTile} 'ice';
-DeadlyTile: {DeadlyTile} 'deadly';
-CrumbleTile: 'crumble' 'into' collapseTile=[TileDef];
-FillableTile: 'fillable' 'into' filledTile=[TileDef];
-ConveyorTile: 'conveyor' direction=Direction;
+Solid:    {Solid}   'BLOCKS';
+Ice:      {Ice}     'SLIDES';
+Deadly:   {Deadly}  'DESTROYS';
+Crumble:  'COLLAPSES' 'INTO' target=[TileDef];
+Fillable: 'FILLS'     'INTO' target=[TileDef];
+Conveyor: 'CARRIES'   direction=Direction;
 
-// ==== Objects ====
-
-ObjectsBlock:
-	{ObjectsBlock} 'objects' '{' entries+=ObjectDef+ '}';
+// ========
+// OBJECTS
+// ========
 
 ObjectDef:
-	'object' name=ID char=STRING '{'
-		(('objectPalette' objectPalette=ObjectPalette)? &
-		'tileIdx' tileIdx=INT &
-		'spriteIdx' spriteIdx=INT &
-		('onGoal' onGoalTileIdx=INT)?)
-	'}';
+	name=ID 'USES' texture=[Texture]
+	('ON_GOAL' goalTexture=[Texture])?;
 
-enum ObjectPalette: OBP0 | OBP1;
+// =======
+// PLAYER
+// =======
 
-// ==== Player ====
+Player:
+	anims+=Animation+;
 
-PlayerDef:
-	'player' (canPull?='canPull')? '{'
-		(('objectPalette' objectPalette=ObjectPalette)? &
-		'walk' walk=AnimBlock &
-		('push' push=AnimBlock)? &
-		('pull' pull=AnimBlock)?)
-	'}';
+Animation:
+	kind=AnimKind direction=Direction (frames=FrameList | mirror=MirrorOf);
 
-AnimBlock:
-	'{'
-		'up' up=DirAnim
-		'down' down=DirAnim
-		'left' left=DirAnim
-		'right' right=DirAnim
-	'}';
+enum AnimKind: WALK | PUSH | PULL;
 
-DirAnim: FrameList | FlipAnim;
-FrameList: '[' frames+=INT (',' frames+=INT)* ']';
-FlipAnim: (flipX?='flipX' | flipY?='flipY') source=Direction;
-enum Direction: down | up | left | right;
+FrameList:
+	textures+=[Texture]+;
 
-// ==== Legend ====
+MirrorOf:
+	'MIRROR' source=Direction;
 
-LegendBlock:
-	{LegendBlock} 'legend' '{' entries+=LegendEntry+ '}';
+enum Direction: DOWN | UP | LEFT | RIGHT;
+
+// =======
+// LEGEND
+// =======
 
 LegendEntry:
-	char=STRING '=' entity=Subject 'on' tile=[TileDef];
+	symbol=STRING '=' subject=Subject 'ON' tile=[TileDef];
 
 Subject: PlayerRef | ObjectRef;
-PlayerRef: {PlayerRef} 'Player';
-ObjectRef: ref=[ObjectDef];
+PlayerRef: {PlayerRef} 'PLAYER';
+ObjectRef: object=[ObjectDef];
 
-// ==== Win ====
-
-WinBlock:
-	{WinBlock} 'win' '{' conditions+=WinCondition+ '}';
+// ====
+// WIN
+// ====
 
 WinCondition: AllOn | SomeOn | NoEntity;
-AllOn: 'all' subject=Subject 'on' tile=[TileDef];
-SomeOn: 'some' subject=Subject 'on' tile=[TileDef];
-NoEntity: 'no' entity=[Entity];
+AllOn:  'ALL'  subject=Subject 'ON' tile=[TileDef];
+SomeOn: 'SOME' subject=Subject 'ON' tile=[TileDef];
+NoEntity: 'NO' entity=[Entity];
 
 Entity: TileDef | ObjectDef;
 
-// ==== Sounds ====
+// =======
+// SOUNDS
+// =======
 
-SoundBlock:
-	{SoundBlock} 'sounds' '{'
-		(('playerMove' playerMove = SoundSpec)? &
-		('playerBlocked' playerBlocked = SoundSpec)? &
-		('boxPush' boxPush = SoundSpec)? &
-		('boxOnGoal' boxOnGoal = SoundSpec)? &
-		('boxDestroyed' boxDestroyed = SoundSpec)? &
-		('levelComplete' levelComplete = SoundSpec)? &
-		('levelRestart' levelRestart = SoundSpec)? &
-		('crumble' crumble = SoundSpec)? &
-		('menuMove' menuMove = SoundSpec)? &
-		('menuSelect' menuSelect = SoundSpec)?)
-	'}';
+Sound:
+	event=SoundEvent channel=SoundChannel r0=INT r1=INT r2=INT r3=INT r4=INT;
 
-SoundSpec:
-	'{' channel=SoundChannel r0=INT r1=INT r2=INT r3=INT r4=INT '}';
+enum SoundEvent:
+	MOVE | BLOCKED | PUSH | ON_GOAL | DESTROY | COMPLETE | RESTART | COLLAPSE | MENU_MOVE | MENU_OK;
 
 enum SoundChannel: NR1 | NR2 | NR3 | NR4;
 
-// ==== Levels ====
-
-LevelsBlock:
-	{LevelsBlock} 'levels' '{' levels+=Level+ '}';
+// =======
+// LEVELS
+// =======
 
 Level:
-	'level' '{' rows+=STRING+ '}';
+	'LEVEL' rows+=STRING+;
+
+// ==========
+// TERMINALS
+// ==========
+
+terminal SEPARATOR: '=' '='+ (' ' | '\t')* ('\r'? '\n');
+
+terminal HEX: '#' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
+terminal fragment HEX_DIGIT: '0'..'9' | 'a'..'f' | 'A'..'F';

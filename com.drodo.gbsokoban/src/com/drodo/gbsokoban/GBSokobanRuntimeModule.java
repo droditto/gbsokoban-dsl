@@ -3,9 +3,14 @@
  */
 package com.drodo.gbsokoban;
 
+import com.drodo.gbsokoban.generator.BuildTrigger;
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 public class GBSokobanRuntimeModule extends AbstractGBSokobanRuntimeModule {
+
+	public Class<? extends BuildTrigger> bindBuildTrigger() {
+		return BuildTrigger.None.class;
+	}
 }

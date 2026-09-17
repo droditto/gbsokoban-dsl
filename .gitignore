@@ -3,7 +3,9 @@
 .DS_Store
 bin/
 src-gen/
-xtend-gen/
+**/xtend-gen/*
+!**/xtend-gen/.gitkeep
 test-bin/
 **/model/generated/
 .antlr-generator-3.2.0-patch.jar
+plugin.xml_gen

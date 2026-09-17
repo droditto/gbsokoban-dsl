@@ -5,6 +5,9 @@ package com.drodo.gbsokoban.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.drodo.gbsokoban.generator.BuildTrigger;
+import com.drodo.gbsokoban.ui.build.EclipseMakeTrigger;
+
 /**
  * Use this class to register components to be used within the Eclipse IDE.
  */
@@ -12,5 +15,9 @@ public class GBSokobanUiModule extends AbstractGBSokobanUiModule {
 
 	public GBSokobanUiModule(AbstractUIPlugin plugin) {
 		super(plugin);
+	}
+
+	public Class<? extends BuildTrigger> bindBuildTrigger() {
+		return EclipseMakeTrigger.class;
 	}
 }
