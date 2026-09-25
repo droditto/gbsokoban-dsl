@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>GBSokoban DSL</title>
+	<link rel="icon" href="/favicon.svg">
+	<link rel="shortcut icon" href="/favicon.png">
+</head>
+<body>
+	<header>
+		<h1>GBSokoban DSL</h1>
+		<div class="actions">
+			<button id="play">Compilar</button>
+			<button id="download" disabled>Exportar</button>
+			<button id="share">Compartir</button>
+			<a class="button" href="/docs/" target="_blank" rel="noopener">Documentación</a>
+		</div>
+	</header>
+	<main>
+		<section id="editor"></section>
+		<div id="splitter"></div>
+		<aside>
+			<canvas id="screen" width="160" height="144" tabindex="0"></canvas>
+			<p class="hint" hidden>
+				Flechas para moverte y para elegir en los menús<br>
+				X o Enter para confirmar<br>
+				Z para volver atrás<br>
+				<span id="pull" hidden>Mantén pulsada la Z para arrastrar una caja<br></span>
+				Dentro del juego, Enter abre el menú de pausa
+			</p>
+			<p id="status"></p>
+			<pre id="log"></pre>
+			<p class="study">Este editor forma parte de un estudio de usabilidad sobre lenguajes
+				específicos de dominio para hacer juegos Sokoban en Game Boy.
+				<a class="button" href="https://docs.google.com/forms/" target="_blank" rel="noopener">Responder al cuestionario</a>
+			</p>
+		</aside>
+	</main>
+	<script type="module" src="/src/main.js"></script>
+</body>
+</html>

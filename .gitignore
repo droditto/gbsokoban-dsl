@@ -9,3 +9,9 @@ test-bin/
 **/model/generated/
 .antlr-generator-3.2.0-patch.jar
 plugin.xml_gen
+
+build/
+target/
+node_modules/
+web/dist/
+web/public/docs/

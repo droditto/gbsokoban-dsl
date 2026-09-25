@@ -172,6 +172,14 @@ void ui_text_screen_begin(void) {
     HIDE_WIN;
     SCX_REG = 0;
     SCY_REG = 0;
+#ifdef FEAT_COLOR
+    // Clear the level's palettes from the attribute map too.
+    if (_cpu == CGB_TYPE) {
+        VBK_REG = VBK_ATTRIBUTES;
+        fill_bkg_rect(0, 0, BKG_MAP_TILES, BKG_MAP_TILES, 0);
+        VBK_REG = VBK_TILES;
+    }
+#endif
     fill_bkg_rect(0, 0, BKG_MAP_TILES, BKG_MAP_TILES, 0);
 }
 

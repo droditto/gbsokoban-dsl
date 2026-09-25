@@ -23,6 +23,9 @@ public final class ScreenText {
 
 	public static final int PANEL_ROWS = 2;
 
+	/** Rows above PUSH START, with a blank row on each side. */
+	public static final int TITLE_ROWS = ROWS - 5;
+
 	public static final int PLAY_PIXEL_HEIGHT = PIXEL_HEIGHT - HUD_ROWS * 8;
 
 	private ScreenText() {
@@ -43,9 +46,16 @@ public final class ScreenText {
 				.replaceAll("^\n+|\n+$", "").trim();
 	}
 
-	public static String fitBlock(String text, int maxRows) {
-		List<String> rows = wrap(text);
-		return String.join("\n", rows.subList(0, Math.min(rows.size(), maxRows)));
+	public static List<String> titleRows(String title, String author) {
+		List<String> rows = new ArrayList<>();
+		if (!printable(title).isEmpty())
+			rows.addAll(wrap(title));
+		if (!printable(author).isEmpty()) {
+			if (!rows.isEmpty())
+				rows.add("");
+			rows.addAll(wrap("BY " + author));
+		}
+		return rows;
 	}
 
 	public static List<String> wrap(String text) {

@@ -3,9 +3,24 @@
  */
 package com.drodo.gbsokoban.ide;
 
+import org.eclipse.xtext.ide.editor.quickfix.IQuickFixProvider;
+import org.eclipse.xtext.ide.server.codeActions.ICodeActionService2;
+import org.eclipse.xtext.ide.server.codeActions.QuickFixCodeActionService;
+
+import com.drodo.gbsokoban.ide.quickfix.GBSokobanIdeQuickfixProvider;
 
 /**
  * Use this class to register ide components.
  */
 public class GBSokobanIdeModule extends AbstractGBSokobanIdeModule {
+
+	/** Without it the language server offers no code actions. */
+	@SuppressWarnings("restriction")
+	public Class<? extends ICodeActionService2> bindICodeActionService2() {
+		return QuickFixCodeActionService.class;
+	}
+
+	public Class<? extends IQuickFixProvider> bindIQuickFixProvider() {
+		return GBSokobanIdeQuickfixProvider.class;
+	}
 }

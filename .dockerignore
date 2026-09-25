@@ -1,0 +1,9 @@
+**/node_modules
+**/target
+**/bin
+**/src-gen
+**/xtend-gen
+build
+web/dist
+web/public/docs
+.git

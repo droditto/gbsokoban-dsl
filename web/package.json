@@ -1,0 +1,23 @@
+{
+  "name": "gbsokoban-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs & server=$!; trap \"kill $server\" EXIT; vite",
+    "build": "mdbook build docs && vite build",
+    "start": "npm run build && node server.mjs --serve-dist",
+    "docs": "mdbook build docs"
+  },
+  "dependencies": {
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.36.4",
+    "@marimo-team/codemirror-languageserver": "^2.0.0",
+    "codemirror": "^6.0.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

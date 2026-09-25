@@ -51,16 +51,29 @@ public class GameValidator extends AbstractDeclarativeValidator {
 		reportScreenText(game.getTitle(), GBSokobanPackage.Literals.GAME__TITLE);
 		reportScreenText(game.getAuthor(), GBSokobanPackage.Literals.GAME__AUTHOR);
 		reportScreenText(game.getEnding(), GBSokobanPackage.Literals.GAME__ENDING);
+
+		int title = ScreenText.titleRows(game.getTitle(), game.getAuthor()).size();
+		if (title > ScreenText.TITLE_ROWS)
+			error("The title screen needs " + title + " rows and only " + ScreenText.TITLE_ROWS
+					+ " fit above PUSH START. Shorten the title or the author",
+					ScreenText.titleRows(game.getTitle(), null).size() >= ScreenText.titleRows(null, game.getAuthor()).size()
+							? GBSokobanPackage.Literals.GAME__TITLE
+							: GBSokobanPackage.Literals.GAME__AUTHOR);
+		int ending = ScreenText.wrap(game.getEnding()).size();
+		if (ending > ScreenText.ROWS)
+			error("This needs " + ending + " rows and only " + ScreenText.ROWS + " fit on the screen",
+					GBSokobanPackage.Literals.GAME__ENDING);
 	}
 
 	private void reportScreenText(String text, EStructuralFeature feature) {
 		if (ScreenText.losesCharacters(text))
-			warning("This will show as '" + ScreenText.printable(text)
-					+ "'. The font has only A-Z, 0-9 and spaces", feature);
+			warning((ScreenText.printable(text).isEmpty() ? "None of this will show"
+					: "This will show as '" + ScreenText.printable(text) + "'")
+					+ ". The font has only A-Z, 0-9 and spaces", feature);
 		for (String row : ScreenText.wrap(text))
 			if (row.length() > ScreenText.COLUMNS)
-				warning("'" + row + "' is " + row.length() + " characters long and only "
-						+ ScreenText.COLUMNS + " fit on a row. It will be cut off", feature);
+				error("'" + row + "' is " + row.length() + " characters long and only "
+						+ ScreenText.COLUMNS + " fit on a row", feature);
 	}
 
 	@Check

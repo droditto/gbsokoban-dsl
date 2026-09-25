@@ -2,9 +2,9 @@ package com.drodo.gbsokoban.validation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +27,7 @@ import com.drodo.gbsokoban.gBSokoban.ObjectRef;
 import com.drodo.gbsokoban.gBSokoban.PlayerRef;
 import com.drodo.gbsokoban.gBSokoban.Solid;
 import com.drodo.gbsokoban.gBSokoban.SomeOn;
+import com.drodo.gbsokoban.gBSokoban.Subject;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
 import com.drodo.gbsokoban.gBSokoban.WinCondition;
 import com.drodo.gbsokoban.model.Directions;
@@ -115,7 +116,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 		}
 	}
 
-	private record LevelGrid(int width, int height, List<TileDef> tiles, Set<ObjectDef> objects) {
+	private record LevelGrid(int width, int height, List<TileDef> tiles, List<ObjectDef> objects) {
 		TileDef at(int x, int y) {
 			return tiles.get(y * width + x);
 		}
@@ -134,7 +135,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 		int height = level.getRows().size();
 		int width = Levels.width(level);
 		List<TileDef> tiles = new ArrayList<>(width * height);
-		Set<ObjectDef> objects = new LinkedHashSet<>();
+		List<ObjectDef> objects = new ArrayList<>();
 
 		for (int y = 0; y < height; y++) {
 			String row = level.getRows().get(y);
@@ -229,7 +230,32 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 				level, GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 	}
 
-	private static Boolean isVacuousIn(WinCondition condition, Set<TileDef> tiles, Set<ObjectDef> objects) {
+	@Check
+	public void checkLevelHasEnoughObjects(Level level) {
+		Game game = EcoreUtil2.getContainerOfType(level, Game.class);
+		if (game == null || game.getTiles().isEmpty())
+			return;
+		LevelGrid grid = gridOf(game, level);
+		for (WinCondition condition : game.getWin()) {
+			boolean all = condition instanceof AllOn;
+			if (!all && !(condition instanceof SomeOn))
+				continue;
+			Subject subject = all ? ((AllOn) condition).getSubject() : ((SomeOn) condition).getSubject();
+			TileDef tile = all ? ((AllOn) condition).getTile() : ((SomeOn) condition).getTile();
+			if (!(subject instanceof ObjectRef) || tile == null)
+				continue;
+			ObjectDef object = ((ObjectRef) subject).getObject();
+			int goals = Collections.frequency(grid.tiles(), tile);
+			int placed = Collections.frequency(grid.objects(), object);
+			int needed = all ? goals : Math.min(goals, 1);
+			if (object != null && placed < needed)
+				warning("This level needs " + needed + " '" + object.getName() + "' on '" + tile.getName()
+						+ "' and has " + placed + ", so it can never be completed",
+						level, GBSokobanPackage.Literals.LEVEL__ROWS, 0);
+		}
+	}
+
+	private static Boolean isVacuousIn(WinCondition condition, Set<TileDef> tiles, List<ObjectDef> objects) {
 		if (condition instanceof AllOn) {
 			TileDef tile = ((AllOn) condition).getTile();
 			return tile == null ? null : !tiles.contains(tile);

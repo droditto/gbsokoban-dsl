@@ -9,6 +9,7 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: com.drodo.gbsokoban,
  org.eclipse.xtext.ide,
  org.eclipse.xtext.xbase.ide,
+ org.eclipse.lsp4j,
  org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Export-Package: com.drodo.gbsokoban.ide.contentassist.antlr.internal,

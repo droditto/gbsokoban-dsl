@@ -1,0 +1,224 @@
+TITLE "SOKOBAN"
+AUTHOR "TU NOMBRE"
+MOVE_SPEED 8
+ENDING "YOU WIN\nSEE YOU AGAIN"
+
+=========
+PALETTES
+=========
+
+ash    RGB_WHITE RGB_LIGHTGRAY RGB_DARKGRAY RGB_BLACK
+brick  RGB_WHITE #C0563C #7A2E1E RGB_BLACK
+ember  RGB_WHITE RGB_ORANGE RGB_DARKRED RGB_BLACK
+cobalt RGB_WHITE #F5D76E #3A6EA5 RGB_BLACK
+
+=========
+TEXTURES
+=========
+
+floor_art USES ash
+"00000000"
+"00000000"
+"00000000"
+"00000000"
+"00000000"
+"00000000"
+"00000000"
+"00000000"
+
+wall_art USES brick
+"21112111"
+"32223222"
+"11211121"
+"22322232"
+"21112111"
+"32223222"
+"11211121"
+"22322232"
+
+goal_art USES ash
+"00000000"
+"00000000"
+"00000000"
+"00033000"
+"00033000"
+"00000000"
+"00000000"
+"00000000"
+
+crate_art USES ember
+"31111113"
+"13333331"
+"13100101"
+"13011301"
+"13011301"
+"13133101"
+"10000001"
+"21111112"
+
+crate_done_art USES cobalt
+"32222223"
+"23333332"
+"23211212"
+"23122312"
+"23122312"
+"23233212"
+"21111112"
+"12222221"
+
+walk_right_1 USES cobalt
+"2..22.3."
+"..2223.."
+"..1111.."
+"..222..."
+".223311."
+"..222..."
+".32.2..."
+"..3.33.."
+
+walk_right_2 USES cobalt
+"......3."
+"...223.."
+"..2111.."
+"...2221."
+".1233..."
+"..2222.."
+"32..32.."
+".33..33."
+
+walk_up_1 USES cobalt
+"........"
+".1......"
+".3.11..."
+".232232."
+".2322323"
+"..2333.1"
+".32.33.."
+".33....."
+
+walk_up_2 USES cobalt
+"........"
+"......1."
+"...11.3."
+".232232."
+"3232232."
+"1.3332.."
+"..33.23."
+".....33."
+
+push_right_1 USES cobalt
+"...22.3."
+"..2223.."
+"..1111.1"
+"...22231"
+"..233..."
+"..222..."
+"322.2..."
+".3..33.."
+
+push_right_2 USES cobalt
+"......3."
+"...223.."
+"..2111.1"
+"...22231"
+"..233..."
+"..2222.."
+"32..32.."
+".33..33."
+
+push_up_1 USES cobalt
+".11..11."
+".3....3."
+".2.11.2."
+".232232."
+".232232."
+"..2333.."
+".32.33.."
+".33....."
+
+push_up_2 USES cobalt
+".11..11."
+".3....3."
+".2.11.2."
+".232232."
+".232232."
+"..3332.."
+"..33.23."
+".....33."
+
+======
+TILES
+======
+
+floor " " USES floor_art
+wall  "#" USES wall_art BLOCKS
+goal  "." USES goal_art
+
+========
+OBJECTS
+========
+
+crate USES crate_art ON_GOAL crate_done_art
+
+=======
+PLAYER
+=======
+
+WALK RIGHT walk_right_1 walk_right_2
+WALK LEFT  MIRROR RIGHT
+WALK UP    walk_up_1 walk_up_2
+WALK DOWN  MIRROR UP
+PUSH RIGHT push_right_1 push_right_2
+PUSH LEFT  MIRROR RIGHT
+PUSH UP    push_up_1 push_up_2
+PUSH DOWN  MIRROR UP
+
+=======
+LEGEND
+=======
+
+"@" = PLAYER ON floor
+"+" = PLAYER ON goal
+"$" = crate  ON floor
+"*" = crate  ON goal
+
+====
+WIN
+====
+
+ALL crate ON goal
+
+=======
+SOUNDS
+=======
+
+MOVE     NR1   0 129  67 115 134
+PUSH     NR1   0 193  98  96 135
+ON_GOAL  NR2   0 129 115  89 135
+COMPLETE NR3 128 192  32  50 199
+
+=======
+LEVELS
+=======
+
+LEVEL
+"#####"
+"#@  #"
+"# $$# ###"
+"# $ # #.#"
+"### ###.#"
+" ##    .#"
+" #   #  #"
+" #   ####"
+" #####"
+
+LEVEL
+"##########"
+"#..@     #"
+"#..$  #  #"
+"#  #$## ##"
+"# $     #"
+"##### # #"
+"  # $   #"
+"  #     #"
+"  #######"

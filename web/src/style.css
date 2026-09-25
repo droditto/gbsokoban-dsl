@@ -1,0 +1,179 @@
+/* Licence in public/fonts/LICENSE.txt. */
+@font-face {
+	font-family: InterVariable;
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/fonts/InterVariable.woff2') format('woff2');
+}
+
+:root {
+	/* mdBook's "coal" theme, as in the documentation. */
+	--background: hsl(200, 7%, 8%);
+	--border: hsl(200, 7%, 13%);
+	--text: #a1adb8;
+	--muted: #666;
+	--accent: #3473ad;
+	--dim: #43484d;
+	--warning: #f48771;
+
+	--font: 14px/1.5 InterVariable, system-ui, sans-serif;
+	--code: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--tight: 4px;
+	--gap: 8px;
+	--pad: 12px;
+
+	/* 3 × 160 + 2 × --pad: every pixel the same size. */
+	--panel-width: 504px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background: var(--background);
+	color: var(--text);
+	font: var(--font);
+	font-feature-settings: 'ss01', 'ss02', 'case';
+	letter-spacing: -0.005em;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	height: 50px;
+	padding: 0 var(--pad);
+	border-bottom: 1px solid var(--border);
+}
+
+h1 {
+	flex: 1;
+	margin: 0;
+	font-size: 24px;
+	font-weight: 400;
+	letter-spacing: -0.02em;
+}
+
+aside p { margin: 0; }
+
+#status.warning { color: var(--warning); }
+
+#log {
+	flex: 1;
+	margin: 0;
+	overflow: auto;
+	white-space: pre-wrap;
+	font: var(--code);
+	color: var(--muted);
+}
+
+button,
+.button {
+	font: var(--font);
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--text);
+	text-decoration: underline;
+	cursor: pointer;
+	transition: color 0.15s;
+}
+
+.actions {
+	display: flex;
+	align-items: center;
+	gap: var(--pad);
+}
+
+button:hover:enabled,
+.button:hover { color: var(--accent); }
+
+button:disabled {
+	color: var(--dim);
+	cursor: default;
+}
+
+main { flex: 1; display: flex; min-height: 0; }
+
+#editor { flex: 1; min-width: 0; overflow: hidden; }
+#editor .cm-editor { height: 100%; }
+
+#splitter {
+	flex: 0 0 8px;
+	position: relative;
+	color: var(--dim);
+	cursor: col-resize;
+}
+
+#splitter::before,
+#splitter::after {
+	content: '';
+	position: absolute;
+	border-left: dotted 2px currentColor;
+}
+
+#splitter::before {
+	left: 4px;
+	top: calc(50% - 6px);
+	height: 12px;
+}
+
+#splitter::after {
+	left: 6px;
+	top: calc(50% - 8px);
+	height: 16px;
+}
+
+aside {
+	width: var(--panel-width);
+	/* 1× to 5× the screen, leaving 320px for the code. */
+	min-width: calc(160px + 2 * var(--pad));
+	max-width: min(calc(800px + 2 * var(--pad)), calc(100% - 320px));
+	display: flex;
+	flex-direction: column;
+	gap: var(--pad);
+	padding: var(--pad);
+}
+
+canvas {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 160 / 144;
+	outline-offset: var(--tight);
+	image-rendering: pixelated;
+	background: #000;
+}
+
+.study .button {
+	display: block;
+	width: fit-content;
+	margin-top: var(--tight);
+}
+
+body.resizing { user-select: none; }
+body.resizing main * { pointer-events: none; }
+
+.cm-swatch,
+.cm-row { pointer-events: none; }
+
+.cm-swatch {
+	display: inline-block;
+	width: 0.9em;
+	height: 0.9em;
+	margin-right: var(--tight);
+	vertical-align: -0.05em;
+}
+
+.cm-row {
+	/* 1px taller so rows meet; the margins keep the line height. */
+	display: inline-flex;
+	height: calc(var(--row) + 1px);
+	margin: calc((1em - var(--row) - 1px) / 2) 0 calc((1em - var(--row) - 1px) / 2) var(--gap);
+	vertical-align: middle;
+}
+
+.cm-row span { width: var(--row); }
