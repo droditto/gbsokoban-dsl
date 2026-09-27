@@ -1,0 +1,68 @@
+@font-face {
+	font-family: InterVariable;
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/fonts/InterVariable.woff2') format('woff2');
+}
+
+html,
+body,
+.menu-title {
+	font-family: InterVariable, system-ui, sans-serif;
+}
+
+body {
+	font-feature-settings: 'ss01', 'ss02', 'case';
+	letter-spacing: -0.005em;
+}
+
+code,
+pre {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+code {
+	font-size: 0.85em;
+	font-weight: 500;
+}
+
+h1, h2, h3, h4 { font-weight: 600; }
+
+/* As in Pan Docs: mdBook's weight 200 barely reads. */
+.menu-title {
+	font-weight: 400;
+	letter-spacing: -0.02em;
+	color: var(--fg);
+}
+
+.box {
+	margin: 20px 0;
+	padding: 1.6px 20px;
+	border-left: 0.75rem solid;
+	background-color: var(--quote-bg);
+}
+
+.box-title {
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.assist-box { border-color: #3a6fc4; }
+.assist-box .box-title { color: #3a6fc4; }
+
+.fix-box { border-color: #f0b400; }
+.fix-box .box-title { color: #f0b400; }
+
+/* The editor's One Dark colours. */
+code.language-gbsoko { color: #abb2bf; background: #282c34; }
+.language-gbsoko .hljs-comment, .language-gbsoko .hljs-meta { color: #7d8799; }
+.language-gbsoko .hljs-section { color: #e06c75; font-weight: bold; }
+.language-gbsoko .hljs-string { color: #98c379; }
+.language-gbsoko .hljs-number { color: #e5c07b; }
+.language-gbsoko .hljs-operator { color: #56b6c2; }
+.language-gbsoko .hljs-keyword { color: #c678dd; }
+.language-gbsoko .hljs-literal { color: #d19a66; }
+.language-gbsoko .hljs-variable { color: #e06c75; }
+
+.swatch { display: inline-block; width: 1em; height: 1em; vertical-align: -0.15em; border: 1px solid #555; }

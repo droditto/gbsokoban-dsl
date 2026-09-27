@@ -61,7 +61,7 @@ public class GameValidator extends AbstractDeclarativeValidator {
 							: GBSokobanPackage.Literals.GAME__AUTHOR);
 		int ending = ScreenText.wrap(game.getEnding()).size();
 		if (ending > ScreenText.ROWS)
-			error("This needs " + ending + " rows and only " + ScreenText.ROWS + " fit on the screen",
+			error("The ending needs " + ending + " rows and only " + ScreenText.ROWS + " fit on the screen",
 					GBSokobanPackage.Literals.GAME__ENDING);
 	}
 
@@ -116,7 +116,7 @@ public class GameValidator extends AbstractDeclarativeValidator {
 
 	private void reportDuplicateName(EObject host, String name, Set<String> used, EStructuralFeature feature) {
 		if (name != null && !used.add(name.toLowerCase(Locale.ROOT)))
-			error("The name '" + name + "' is already taken. Names ignore capitals",
+			error("The name '" + name + "' is already used. Names ignore capitals",
 					host, feature, -1);
 	}
 
@@ -142,14 +142,14 @@ public class GameValidator extends AbstractDeclarativeValidator {
 			owner.put(reserved, ENGINE);
 
 		for (TileDef tile : game.getTiles()) {
-			claimSymbol(tile, CSymbols.tile(tile.getName()), "tile " + tile.getName(), owner);
-			claimSymbol(tile, CSymbols.cell(tile.getName()), "tile " + tile.getName(), owner);
+			claimSymbol(tile, CSymbols.tile(tile.getName()), "'" + tile.getName() + "'", owner);
+			claimSymbol(tile, CSymbols.cell(tile.getName()), "'" + tile.getName() + "'", owner);
 		}
 		for (ObjectDef object : game.getObjects()) {
-			claimSymbol(object, CSymbols.cell(object.getName()), "object " + object.getName(), owner);
+			claimSymbol(object, CSymbols.cell(object.getName()), "'" + object.getName() + "'", owner);
 			if (object.getGoalTexture() != null)
 				claimSymbol(object, CSymbols.onGoalCell(object.getName()),
-						"the ON_GOAL art of " + object.getName(), owner);
+						"the ON_GOAL texture of '" + object.getName() + "'", owner);
 		}
 	}
 
@@ -158,7 +158,7 @@ public class GameValidator extends AbstractDeclarativeValidator {
 		if (previous == null || previous.equals(who))
 			return;
 		error(previous.equals(ENGINE)
-				? "The engine already uses this name. Pick another one"
+				? "The game already uses this name internally. Use another one"
 				: "This ends up with the same name as " + previous + ". Rename one of them",
 				host, GBSokobanPackage.Literals.ENTITY__NAME, -1);
 	}
@@ -167,7 +167,7 @@ public class GameValidator extends AbstractDeclarativeValidator {
 	public void checkUniqueSymbols(Game game) {
 		Map<String, String> owner = new HashMap<>();
 		for (TileDef tile : game.getTiles())
-			reportDuplicateSymbol(tile, tile.getSymbol(), "tile " + tile.getName(),
+			reportDuplicateSymbol(tile, tile.getSymbol(), "'" + tile.getName() + "'",
 					GBSokobanPackage.Literals.TILE_DEF__SYMBOL, owner);
 		for (LegendEntry entry : game.getLegend())
 			reportDuplicateSymbol(entry, entry.getSymbol(), "a legend entry",
@@ -180,7 +180,7 @@ public class GameValidator extends AbstractDeclarativeValidator {
 			return;
 		String previous = owner.put(symbol, who);
 		if (previous != null)
-			error("Symbol '" + symbol + "' is already used by " + previous,
+			error("'" + symbol + "' is already used by " + previous + ". Use another character",
 					host, feature, -1, GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL);
 	}
 }

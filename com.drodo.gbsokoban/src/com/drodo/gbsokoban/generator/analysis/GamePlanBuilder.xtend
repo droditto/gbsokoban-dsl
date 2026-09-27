@@ -57,7 +57,7 @@ class GamePlanBuilder {
 		val palettes = new PaletteResolver(background, sprites)
 		val winPlans = winConditions(game)
 		val features = computeFeatures(game, goalMap, winPlans)
-		val moveSpeed = if (game.moveSpeed > 0) game.moveSpeed else Speeds.DEFAULT_MOVE_SPEED
+		val moveSpeed = if (game.moveSpeed > 0) game.moveSpeed else Speeds.defaultMoveSpeed(cellPx)
 		val animFrames = AnimationChain.frameCount(game.player)
 
 		new GamePlan(

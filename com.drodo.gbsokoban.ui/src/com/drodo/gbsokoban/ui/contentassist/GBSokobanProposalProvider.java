@@ -39,7 +39,8 @@ public class GBSokobanProposalProvider extends AbstractGBSokobanProposalProvider
 	public void completeGame_MoveSpeed(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		super.completeGame_MoveSpeed(model, assignment, context, acceptor);
-		propose(String.valueOf(Speeds.DEFAULT_MOVE_SPEED), Speeds.DEFAULT_MOVE_SPEED + " (the default)", context, acceptor);
+		int speed = Speeds.defaultMoveSpeed(GameTextures.cellPx(EcoreUtil2.getContainerOfType(model, Game.class)));
+		propose(String.valueOf(speed), speed + " (the default)", context, acceptor);
 	}
 
 	@Override
@@ -52,9 +53,10 @@ public class GBSokobanProposalProvider extends AbstractGBSokobanProposalProvider
 		int frames = AnimationChain.frameCount(game.getPlayer());
 		if (frames == 0)
 			return;
-		int moveSpeed = game.getMoveSpeed() > 0 ? game.getMoveSpeed() : Speeds.DEFAULT_MOVE_SPEED;
-		int derived = Speeds.animSpeedFor(frames, moveSpeed, GameTextures.cellPx(game));
-		propose(String.valueOf(derived), derived + " (suggested)", context, acceptor);
+		int cellPx = GameTextures.cellPx(game);
+		int moveSpeed = game.getMoveSpeed() > 0 ? game.getMoveSpeed() : Speeds.defaultMoveSpeed(cellPx);
+		int derived = Speeds.animSpeedFor(frames, moveSpeed, cellPx);
+		propose(String.valueOf(derived), derived + " (matches MOVE_SPEED)", context, acceptor);
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class GBSokobanProposalProvider extends AbstractGBSokobanProposalProvider
 		if (!(model instanceof Animation) || ((Animation) model).getDirection() == null)
 			return;
 		String opposite = Directions.opposite(((Animation) model).getDirection()).getLiteral();
-		propose("MIRROR " + opposite, "MIRROR " + opposite + " (flip the opposite direction)",
+		propose("MIRROR " + opposite, "MIRROR " + opposite + " (reuses " + opposite + ", flipped)",
 				context, acceptor);
 	}
 
@@ -76,11 +78,11 @@ public class GBSokobanProposalProvider extends AbstractGBSokobanProposalProvider
 			return;
 		SoundChannel channel = ((Sound) model).getChannel();
 		if (channel == SoundChannel.NR3)
-			propose("128", "128 (turns the wave channel on)", context, acceptor);
+			propose("128", "128 (turns NR3 on)", context, acceptor);
 		else if (channel == SoundChannel.NR1)
 			propose("0", "0 (no frequency sweep)", context, acceptor);
 		else
-			propose("0", "0 (this channel ignores it)", context, acceptor);
+			propose("0", "0 (ignored by this channel)", context, acceptor);
 	}
 
 	@Override
@@ -106,7 +108,7 @@ public class GBSokobanProposalProvider extends AbstractGBSokobanProposalProvider
 				grid.append('\n');
 			grid.append('"').append(".".repeat(side)).append('"');
 		}
-		propose(grid.toString(), "Insert " + side + "x" + side + " grid", context, acceptor);
+		propose(grid.toString(), side + "x" + side + " grid (empty texture)", context, acceptor);
 	}
 
 	private void proposeFreeSymbol(EObject model, ContentAssistContext context,

@@ -27,14 +27,14 @@ public class TileValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkTileSymbolLength(TileDef tile) {
 		if (tile.getSymbol() != null && tile.getSymbol().length() != 1)
-			error("A symbol must be exactly one character",
+			error("This must be exactly one character",
 					tile, GBSokobanPackage.Literals.TILE_DEF__SYMBOL, -1, GBSokobanValidator.ISSUE_SYMBOL_LENGTH);
 	}
 
 	@Check
 	public void checkLegendSymbolLength(LegendEntry entry) {
 		if (entry.getSymbol() != null && entry.getSymbol().length() != 1)
-			error("A symbol must be exactly one character",
+			error("This must be exactly one character",
 					entry, GBSokobanPackage.Literals.LEGEND_ENTRY__SYMBOL, -1, GBSokobanValidator.ISSUE_SYMBOL_LENGTH);
 	}
 
@@ -45,7 +45,7 @@ public class TileValidator extends AbstractDeclarativeValidator {
 		Game game = EcoreUtil2.getContainerOfType(object, Game.class);
 		if (game == null || GoalTiles.owners(game).containsValue(object))
 			return;
-		warning("'" + object.getName() + "' has no goal to rest on, so this art is never drawn. "
+		warning("'" + object.getName() + "' has no goal to rest on, so this texture is never drawn. "
 				+ "Add a win condition, such as ALL " + object.getName() + " ON <tile>",
 				GBSokobanPackage.Literals.OBJECT_DEF__GOAL_TEXTURE);
 	}

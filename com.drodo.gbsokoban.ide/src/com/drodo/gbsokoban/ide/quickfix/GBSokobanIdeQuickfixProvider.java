@@ -39,7 +39,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL)
 	public void replaceDuplicateSymbol(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Use an available symbol", (ITextModification) (diagnostic, object, document) -> {
+		acceptor.accept("Use a free character", (ITextModification) (diagnostic, object, document) -> {
 			Game game = gameOf(object);
 			if (game == null)
 				return none();
@@ -51,7 +51,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_SYMBOL_LENGTH)
 	public void trimSymbol(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Keep the first character", (ITextModification) (diagnostic, object, document) -> {
+		acceptor.accept("Keep only the first character", (ITextModification) (diagnostic, object, document) -> {
 			String inner = document.getSubstring(diagnostic.getRange()).replace("\"", "");
 			return inner.isEmpty() ? none() : one(diagnostic.getRange(), "\"" + inner.charAt(0) + "\"");
 		});
@@ -59,7 +59,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL)
 	public void allowPulling(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Enable player pull", (ITextModification) (diagnostic, object, document) -> {
+		acceptor.accept("Add PLAYER_CAN_PULL", (ITextModification) (diagnostic, object, document) -> {
 			Position start = new Position(0, 0);
 			return one(new Range(start, start), "PLAYER_CAN_PULL\n");
 		});
@@ -67,7 +67,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
 	public void addPlayerToLegend(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Place the player", (ITextModification) (diagnostic, object, document) -> {
+		acceptor.accept("Add a character for the player", (ITextModification) (diagnostic, object, document) -> {
 			Game game = gameOf(object);
 			if (game == null)
 				return none();
@@ -107,7 +107,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_TEXTURE_SIZE)
 	public void fitTextureToSize(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Fix the texture size", rewrite(Texture.class, (host, text) -> {
+		acceptor.accept("Resize the texture", rewrite(Texture.class, (host, text) -> {
 			int side = sideFor(host, gameOf(host));
 			List<String> lines = new ArrayList<>(List.of(text.split("\n", -1)));
 			int header = 0;
@@ -130,7 +130,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_PALETTE_SIZE)
 	public void fitPaletteToRegister(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Fix the palette size", rewrite(PaletteDef.class, (host, text) -> {
+		acceptor.accept("Resize the palette to 4 colors", rewrite(PaletteDef.class, (host, text) -> {
 			List<String> parts = new ArrayList<>(List.of(text.trim().split("\\s+")));
 			String name = parts.remove(0);
 			if (parts.isEmpty())
@@ -145,7 +145,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS)
 	public void stopPulling(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Drop PLAYER_CAN_PULL",
+		acceptor.accept("Remove PLAYER_CAN_PULL",
 				(ITextModification) (diagnostic, object, document) -> deleteLine(document,
 						diagnostic.getRange().getStart().getLine()));
 	}

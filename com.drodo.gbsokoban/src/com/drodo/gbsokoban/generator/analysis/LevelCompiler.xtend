@@ -9,7 +9,6 @@ import com.drodo.gbsokoban.gBSokoban.PlayerRef
 import com.drodo.gbsokoban.gBSokoban.TileDef
 import com.drodo.gbsokoban.generator.plan.GroupedPos
 import com.drodo.gbsokoban.generator.plan.LevelPlan
-import com.drodo.gbsokoban.model.SymbolPool
 import java.util.IdentityHashMap
 import java.util.LinkedHashMap
 import java.util.List
@@ -53,23 +52,24 @@ class LevelCompiler {
 		for (var y = 0; y < height; y++) {
 			val row = level.rows.get(y)
 			for (var x = 0; x < width; x++) {
-				val beyondRow = x >= row.length
-				val symbol = if (beyondRow) SymbolPool.PADDING_SYMBOL else String.valueOf(row.charAt(x))
 				var int tile = outsideTile
-				val legend = legendBySymbol.get(symbol)
-				if (legend !== null) {
-					tile = indexOfTile.get(legend.tile)
-					if (legend.subject instanceof PlayerRef) {
-						playerX = x; playerY = y
-					} else if (legend.subject instanceof ObjectRef) {
-						val object = (legend.subject as ObjectRef).object
-						boxes.add(new GroupedPos(x, y, indexOfObject.get(object)))
+				if (x < row.length) {
+					val symbol = String.valueOf(row.charAt(x))
+					val legend = legendBySymbol.get(symbol)
+					if (legend !== null) {
+						tile = indexOfTile.get(legend.tile)
+						if (legend.subject instanceof PlayerRef) {
+							playerX = x; playerY = y
+						} else if (legend.subject instanceof ObjectRef) {
+							val object = (legend.subject as ObjectRef).object
+							boxes.add(new GroupedPos(x, y, indexOfObject.get(object)))
+						}
+					} else if (tileIndexBySymbol.containsKey(symbol)) {
+						tile = tileIndexBySymbol.get(symbol)
+					} else {
+						throw new IllegalStateException(
+							"Level symbol '" + symbol + "' at (" + x + "," + y + ") is not a tile and has no legend entry")
 					}
-				} else if (tileIndexBySymbol.containsKey(symbol)) {
-					tile = tileIndexBySymbol.get(symbol)
-				} else if (!beyondRow) {
-					throw new IllegalStateException(
-						"Level symbol '" + symbol + "' at (" + x + "," + y + ") is not a tile and has no legend entry")
 				}
 
 				map.add(tile)

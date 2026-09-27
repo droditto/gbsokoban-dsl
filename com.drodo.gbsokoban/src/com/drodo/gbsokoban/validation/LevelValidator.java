@@ -90,7 +90,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 		}
 
 		if (count == 0)
-			error("A level must place exactly one player", level,
+			error("This level has no player. It needs exactly one", level,
 					GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 		else if (count > 1)
 			error("This level has " + count + " players. It needs exactly one", level,
@@ -140,9 +140,11 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 		for (int y = 0; y < height; y++) {
 			String row = level.getRows().get(y);
 			for (int x = 0; x < width; x++) {
-				String symbol = x < row.length()
-						? String.valueOf(row.charAt(x))
-						: SymbolPool.PADDING_SYMBOL;
+				if (x >= row.length()) {
+					tiles.add(null);
+					continue;
+				}
+				String symbol = String.valueOf(row.charAt(x));
 				LegendEntry entry = legendBySymbol.get(symbol);
 				if (entry == null) {
 					tiles.add(tileBySymbol.get(symbol));
@@ -197,7 +199,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 			}
 			if (cell >= 0 && visited[cell] == 1) {
 				error("The conveyor at (" + cell % grid.width() + "," + cell / grid.width()
-						+ ") carries the player round in a loop. The level could never be left",
+						+ ") carries the player round in a loop, so the level can never be left",
 						level, GBSokobanPackage.Literals.LEVEL__ROWS, cell / grid.width());
 				return;
 			}

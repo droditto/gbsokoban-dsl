@@ -7,16 +7,16 @@ ENDING "YOU WIN\nSEE YOU AGAIN"
 PALETTES
 =========
 
-ash    RGB_WHITE RGB_LIGHTGRAY RGB_DARKGRAY RGB_BLACK
-brick  RGB_WHITE #C0563C #7A2E1E RGB_BLACK
-ember  RGB_WHITE RGB_ORANGE RGB_DARKRED RGB_BLACK
-cobalt RGB_WHITE #F5D76E #3A6EA5 RGB_BLACK
+grays   RGB_WHITE RGB_LIGHTGRAY RGB_DARKGRAY RGB_BLACK
+reds    RGB_WHITE #C0563C #7A2E1E RGB_BLACK
+oranges RGB_WHITE RGB_ORANGE RGB_DARKRED RGB_BLACK
+blues   RGB_WHITE #F5D76E #3A6EA5 RGB_BLACK
 
 =========
 TEXTURES
 =========
 
-floor_art USES ash
+floor_art USES grays
 "00000000"
 "00000000"
 "00000000"
@@ -26,7 +26,7 @@ floor_art USES ash
 "00000000"
 "00000000"
 
-wall_art USES brick
+wall_art USES reds
 "21112111"
 "32223222"
 "11211121"
@@ -36,7 +36,7 @@ wall_art USES brick
 "11211121"
 "22322232"
 
-goal_art USES ash
+goal_art USES grays
 "00000000"
 "00000000"
 "00000000"
@@ -46,7 +46,7 @@ goal_art USES ash
 "00000000"
 "00000000"
 
-crate_art USES ember
+crate_art USES oranges
 "31111113"
 "13333331"
 "13100101"
@@ -56,7 +56,7 @@ crate_art USES ember
 "10000001"
 "21111112"
 
-crate_done_art USES cobalt
+crate_done_art USES blues
 "32222223"
 "23333332"
 "23211212"
@@ -66,7 +66,7 @@ crate_done_art USES cobalt
 "21111112"
 "12222221"
 
-walk_right_1 USES cobalt
+walk_right_1 USES blues
 "2..22.3."
 "..2223.."
 "..1111.."
@@ -76,7 +76,7 @@ walk_right_1 USES cobalt
 ".32.2..."
 "..3.33.."
 
-walk_right_2 USES cobalt
+walk_right_2 USES blues
 "......3."
 "...223.."
 "..2111.."
@@ -86,7 +86,7 @@ walk_right_2 USES cobalt
 "32..32.."
 ".33..33."
 
-walk_up_1 USES cobalt
+walk_up_1 USES blues
 "........"
 ".1......"
 ".3.11..."
@@ -96,7 +96,7 @@ walk_up_1 USES cobalt
 ".32.33.."
 ".33....."
 
-walk_up_2 USES cobalt
+walk_up_2 USES blues
 "........"
 "......1."
 "...11.3."
@@ -106,7 +106,7 @@ walk_up_2 USES cobalt
 "..33.23."
 ".....33."
 
-push_right_1 USES cobalt
+push_right_1 USES blues
 "...22.3."
 "..2223.."
 "..1111.1"
@@ -116,7 +116,7 @@ push_right_1 USES cobalt
 "322.2..."
 ".3..33.."
 
-push_right_2 USES cobalt
+push_right_2 USES blues
 "......3."
 "...223.."
 "..2111.1"
@@ -126,7 +126,7 @@ push_right_2 USES cobalt
 "32..32.."
 ".33..33."
 
-push_up_1 USES cobalt
+push_up_1 USES blues
 ".11..11."
 ".3....3."
 ".2.11.2."
@@ -136,7 +136,7 @@ push_up_1 USES cobalt
 ".32.33.."
 ".33....."
 
-push_up_2 USES cobalt
+push_up_2 USES blues
 ".11..11."
 ".3....3."
 ".2.11.2."
@@ -168,6 +168,7 @@ WALK RIGHT walk_right_1 walk_right_2
 WALK LEFT  MIRROR RIGHT
 WALK UP    walk_up_1 walk_up_2
 WALK DOWN  MIRROR UP
+
 PUSH RIGHT push_right_1 push_right_2
 PUSH LEFT  MIRROR RIGHT
 PUSH UP    push_up_1 push_up_2

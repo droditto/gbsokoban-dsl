@@ -1,0 +1,13 @@
+[book]
+title = "Documentación GBSokoban DSL"
+language = "es"
+
+[build]
+build-dir = "../public/docs"
+
+[output.html]
+site-url = "/docs/"
+default-theme = "coal"
+preferred-dark-theme = "coal"
+additional-css = ["custom.css"]
+additional-js = ["gbsoko.js"]

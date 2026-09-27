@@ -12,8 +12,6 @@ public final class SymbolPool {
 
 	public static final String SUGGESTIONS = "abcdefghijklmnopqrstuvwxyz#$@*+.-~%!&<>^,:;?=/";
 
-	public static final String PADDING_SYMBOL = " ";
-
 	private SymbolPool() {
 	}
 

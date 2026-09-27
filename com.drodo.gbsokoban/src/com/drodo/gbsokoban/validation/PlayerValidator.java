@@ -36,7 +36,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkPullHasObjects(Game game) {
 		if (game.isCanPull() && game.getObjects().isEmpty())
-			warning("This game has no objects to pull. Remove PLAYER_CAN_PULL or add an OBJECTS block",
+			warning("This game has no objects to pull. Remove PLAYER_CAN_PULL or add an OBJECTS section",
 					GBSokobanPackage.Literals.GAME__CAN_PULL, GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS);
 	}
 
@@ -47,7 +47,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 			return;
 		for (Animation anim : player.getAnims())
 			if (anim.getKind() == AnimKind.PULL) {
-				error("A pull animation needs PLAYER_CAN_PULL",
+				error("A PULL animation needs PLAYER_CAN_PULL",
 						anim, GBSokobanPackage.Literals.ANIMATION__KIND, -1, GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL);
 				return;
 			}

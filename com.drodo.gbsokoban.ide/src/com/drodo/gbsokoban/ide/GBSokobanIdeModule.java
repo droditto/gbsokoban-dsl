@@ -3,10 +3,12 @@
  */
 package com.drodo.gbsokoban.ide;
 
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 import org.eclipse.xtext.ide.editor.quickfix.IQuickFixProvider;
 import org.eclipse.xtext.ide.server.codeActions.ICodeActionService2;
 import org.eclipse.xtext.ide.server.codeActions.QuickFixCodeActionService;
 
+import com.drodo.gbsokoban.ide.contentassist.GBSokobanIdeContentProposalProvider;
 import com.drodo.gbsokoban.ide.quickfix.GBSokobanIdeQuickfixProvider;
 
 /**
@@ -22,5 +24,9 @@ public class GBSokobanIdeModule extends AbstractGBSokobanIdeModule {
 
 	public Class<? extends IQuickFixProvider> bindIQuickFixProvider() {
 		return GBSokobanIdeQuickfixProvider.class;
+	}
+
+	public Class<? extends IdeContentProposalProvider> bindIdeContentProposalProvider() {
+		return GBSokobanIdeContentProposalProvider.class;
 	}
 }

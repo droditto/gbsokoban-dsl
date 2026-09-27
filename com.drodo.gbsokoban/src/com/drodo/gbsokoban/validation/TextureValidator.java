@@ -35,7 +35,7 @@ public class TextureValidator extends AbstractDeclarativeValidator {
 		for (int i = 0; i < rows; i++) {
 			String row = texture.getRows().get(i);
 			if (row.length() != rows) {
-				error("This row is " + row.length() + " characters wide. Art must be square, so it "
+				error("This row is " + row.length() + " characters wide. A texture must be square, so it "
 						+ "needs " + rows, texture,
 						GBSokobanPackage.Literals.TEXTURE__ROWS, i, GBSokobanValidator.ISSUE_TEXTURE_SIZE);
 				return;
@@ -43,8 +43,8 @@ public class TextureValidator extends AbstractDeclarativeValidator {
 			for (int x = 0; x < row.length(); x++) {
 				char c = row.charAt(x);
 				if (c != '.' && (c < '0' || c - '0' >= Palettes.ENTRIES)) {
-					error("'" + c + "' is not a palette entry. Use 0 to " + (Palettes.ENTRIES - 1)
-							+ " or . for transparent",
+					error("'" + c + "' is not a color of the palette. Use 0 to " + (Palettes.ENTRIES - 1)
+							+ ", or . for 0",
 							texture, GBSokobanPackage.Literals.TEXTURE__ROWS, i);
 					return;
 				}
@@ -82,17 +82,17 @@ public class TextureValidator extends AbstractDeclarativeValidator {
 		int bkgTiles = TilesetAllocator.allocateBackground(bkg, cellPx).tiles().size();
 		if (bkgTiles > VramLayout.BKG_TILE_BUDGET)
 			reportWhereRoomRunsOut(bkg, cellPx, VramLayout.BKG_TILE_BUDGET, false,
-					"This game needs " + bkgTiles + " background tiles once identical ones are "
-							+ "shared and only " + VramLayout.BKG_TILE_BUDGET + " fit. Reuse art "
-							+ "between tiles and objects. The room runs out here");
+					"The tiles and objects take " + bkgTiles + " slots of video memory and "
+							+ "only " + VramLayout.BKG_TILE_BUDGET + " fit. Reuse textures "
+							+ "between them. The memory runs out here");
 
 		List<Texture> sprites = GameTextures.sprites(game);
 		int spriteTiles = TilesetAllocator.allocateSprites(sprites, cellPx).tiles().size();
 		if (spriteTiles > VramLayout.SPRITE_TILES)
 			reportWhereRoomRunsOut(sprites, cellPx, VramLayout.SPRITE_TILES, true,
-					"This game needs " + spriteTiles + " sprite tiles and only " + VramLayout.SPRITE_TILES
-							+ " fit. Sprite art is never shared, so use fewer animation frames. "
-							+ "The room runs out here");
+					"The player and the moving objects take " + spriteTiles + " slots of video "
+							+ "memory and only " + VramLayout.SPRITE_TILES + " fit. Use fewer frames or "
+							+ "MIRROR. The memory runs out here");
 	}
 
 	private void reportWhereRoomRunsOut(List<Texture> textures, int cellPx, int budget,

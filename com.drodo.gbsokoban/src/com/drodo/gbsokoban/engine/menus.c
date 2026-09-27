@@ -133,20 +133,9 @@ void pause_update(void) {
 
 static uint8_t clear_cursor;
 
-#if defined(FEAT_SAVE) && defined(FEAT_SAVE_ALL_BEATEN)
-// Set on the clear that beat the last level, not on every clear after.
-static uint8_t just_finished;
-#endif
-
 void clear_init(void) {
 #ifdef FEAT_SAVE
-#ifdef FEAT_SAVE_ALL_BEATEN
-    uint8_t finished_before = save_all_levels_beaten();
-#endif
     save_complete_level(current_level, move_count);
-#ifdef FEAT_SAVE_ALL_BEATEN
-    just_finished = !finished_before && save_all_levels_beaten();
-#endif
 #endif
     clear_cursor = 0;
     draw_clear_panel(clear_cursor);
@@ -156,19 +145,17 @@ void clear_update(void) {
     uint8_t choice = ui_overlay_menu_tick(PANEL_MENU_ROW, "NEXT", MENU_ITEM_SELECT, &clear_cursor);
     if (choice == 1) {
 #ifdef FEAT_MULTI_LEVEL
-        // With a level select, the last one beaten can be any of them.
+        if (current_level < TOTAL_LEVELS - 1) {
+            current_level++;
 #if defined(FEAT_SAVE) && defined(FEAT_SAVE_ALL_BEATEN)
-        if (just_finished) {
+        } else if (save_all_levels_beaten()) {
 #ifdef FEAT_END_SCREEN
             current_state = STATE_ALL_LEVELS_COMPLETE;
 #else
             current_state = STATE_TITLE;
 #endif
             return;
-        }
 #endif
-        if (current_level < TOTAL_LEVELS - 1) {
-            current_level++;
         } else {
 #ifdef FEAT_SAVE
             // Past the last level with unbeaten ones still left: wrap to the

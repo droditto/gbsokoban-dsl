@@ -42,7 +42,7 @@ public class PaletteValidator extends AbstractDeclarativeValidator {
 			return;
 		for (PaletteDef palette : game.getPalettes())
 			if (!palette.getColors().isEmpty())
-				warning("This game mixes shades and colors. Pick one or the other",
+				warning("This game mixes DMG and RGB colors, so it is built for the Game Boy Color",
 						palette, GBSokobanPackage.Literals.PALETTE_DEF__NAME, -1);
 	}
 
@@ -77,23 +77,23 @@ public class PaletteValidator extends AbstractDeclarativeValidator {
 		int allowed = color ? Palettes.CGB_BKG_PALETTES : Palettes.DMG_BKG_PALETTES;
 		for (int i = allowed; i < background.size(); i++)
 			error(color
-					? "This game needs " + background.size() + " palettes for its tiles and objects. A "
+					? "This game uses " + background.size() + " palettes for its tiles and objects. A "
 							+ "Game Boy Color allows " + Palettes.CGB_BKG_PALETTES
 					: "An original Game Boy allows " + Palettes.DMG_BKG_PALETTES + " palette for tiles "
-							+ "and objects and this game needs " + background.size()
+							+ "and objects and this game uses " + background.size()
 							+ ". Use '" + background.get(0).getName()
-							+ "' everywhere or write the game in color",
+							+ "' everywhere or make the game in color",
 					background.get(i), GBSokobanPackage.Literals.PALETTE_DEF__NAME, INSIGNIFICANT_INDEX);
 
 		int allowedSprites = color ? Palettes.CGB_OBJECT_PALETTES : Palettes.DMG_OBJECT_PALETTES;
 		for (int i = allowedSprites; i < sprites.size(); i++)
 			error(color
-					? "This game needs " + sprites.size() + " palettes for the player and the moving "
+					? "This game uses " + sprites.size() + " palettes for the player and the moving "
 							+ "objects. A Game Boy Color allows " + Palettes.CGB_OBJECT_PALETTES
 					: "An original Game Boy allows " + Palettes.DMG_OBJECT_PALETTES + " palettes for the "
-							+ "player and the moving objects and this game needs " + sprites.size()
+							+ "player and the moving objects and this game uses " + sprites.size()
 							+ ". Use '" + sprites.get(0).getName() + "' or '" + sprites.get(1).getName()
-							+ "' or write the game in color",
+							+ "' or make the game in color",
 					sprites.get(i), GBSokobanPackage.Literals.PALETTE_DEF__NAME, INSIGNIFICANT_INDEX);
 	}
 }

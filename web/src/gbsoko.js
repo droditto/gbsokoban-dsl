@@ -15,17 +15,19 @@ const VALUES = new Set(['PLAYER', 'WALK', 'PUSH', 'PULL', 'DOWN', 'UP', 'LEFT', 
 // ON_GOAL is art in OBJECTS but an event in SOUNDS.
 export const gbsoko = StreamLanguage.define({
 	name: 'gbsoko',
-	startState: () => ({ section: null }),
-	copyState: (state) => ({ section: state.section }),
+	startState: () => ({ section: null, inComment: false }),
+	copyState: (state) => ({ section: state.section, inComment: state.inComment }),
 	token(stream, state) {
+		if (state.inComment || stream.match('/*')) {
+			state.inComment = !stream.skipTo('*/');
+			if (state.inComment) stream.skipToEnd();
+			else stream.match('*/');
+			return 'comment';
+		}
 		if (stream.eatSpace()) return null;
 
 		if (stream.match('//')) {
 			stream.skipToEnd();
-			return 'comment';
-		}
-		if (stream.match('/*')) {
-			while (!stream.eol() && !stream.match('*/')) stream.next();
 			return 'comment';
 		}
 		if (stream.match(/^==+\s*$/)) return 'meta';

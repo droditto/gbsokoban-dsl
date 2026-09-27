@@ -123,7 +123,7 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkWaveChannelIsAudible(Sound sound) {
 		if (sound.getChannel() == SoundChannel.NR3 && (sound.getR0() & WAVE_DAC_ON) == 0)
-			warning("NR3 is silent unless its first value is " + WAVE_DAC_ON + " or more",
+			warning("Channel NR3 is silent unless its first value is " + WAVE_DAC_ON + " or more",
 					sound, GBSokobanPackage.Literals.SOUND__R0, -1);
 	}
 }

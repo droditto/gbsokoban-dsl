@@ -36,7 +36,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL)
 	public void replaceDuplicateSymbol(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Use an available symbol", "Pick a character nothing else uses.", null,
+		acceptor.accept(issue, "Use a free character", "Replaces it with a character nothing else uses.", null,
 				(IModification) context -> {
 					IXtextDocument doc = context.getXtextDocument();
 					String free = doc.readOnly(resource -> {
@@ -52,7 +52,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_SYMBOL_LENGTH)
 	public void trimSymbol(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Keep the first character", "A symbol is a single character.", null,
+		acceptor.accept(issue, "Keep only the first character", "Deletes everything after the first character.", null,
 				(IModification) context -> {
 					IXtextDocument doc = context.getXtextDocument();
 					String inner = doc.get(issue.getOffset(), issue.getLength()).replace("\"", "");
@@ -63,13 +63,13 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL)
 	public void allowPulling(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Enable player pull", "Add PLAYER_CAN_PULL to the game options.", null,
+		acceptor.accept(issue, "Add PLAYER_CAN_PULL", "Adds PLAYER_CAN_PULL to the game options.", null,
 				(IModification) context -> context.getXtextDocument().replace(0, 0, "PLAYER_CAN_PULL\n"));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
 	public void addPlayerToLegend(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Place the player", "Add a legend entry that puts the player on a plain tile.",
+		acceptor.accept(issue, "Add a character for the player", "Adds a legend entry that puts the player on a plain tile.",
 				null, (IModification) context -> {
 					IXtextDocument doc = context.getXtextDocument();
 					String line = doc.readOnly(resource -> {
@@ -87,7 +87,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 	@Fix(GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS)
 	public void keepFirstPlayer(Issue issue, IssueResolutionAcceptor acceptor) {
 		acceptor.accept(issue, "Keep only the first player",
-				"Replace the extra players with a tile they can stand on.", null,
+				"Replaces the extra players with a tile they can stand on.", null,
 				(IModification) context -> rewrite(issue, context, (host, text) -> {
 					Game game = EcoreUtil2.getContainerOfType(host, Game.class);
 					Set<String> players = playerSymbolsOf(game);
@@ -113,7 +113,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_TEXTURE_SIZE)
 	public void fitTextureToSize(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Fix the texture size", "Pad short rows with transparent and drop the extra ones.",
+		acceptor.accept(issue, "Resize the texture", "Pads short rows with dots and deletes the extra ones.",
 				null, (IModification) context -> rewrite(issue, context, (host, text) -> {
 					if (!(host instanceof Texture))
 						return null;
@@ -183,7 +183,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_PALETTE_SIZE)
 	public void fitPaletteToRegister(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Fix the palette size", "Drop the extras or repeat the last one.", null,
+		acceptor.accept(issue, "Resize the palette to 4 colors", "Deletes the extra colors or repeats the last one.", null,
 				(IModification) context -> rewrite(issue, context, (host, text) -> {
 					List<String> parts = new ArrayList<>(List.of(text.trim().split("\\s+")));
 					String name = parts.remove(0);
@@ -199,7 +199,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS)
 	public void stopPulling(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Drop PLAYER_CAN_PULL", "Nothing in this game can be pulled.", null,
+		acceptor.accept(issue, "Remove PLAYER_CAN_PULL", "Deletes it: nothing in this game can be pulled.", null,
 				(IModification) context -> {
 					IXtextDocument doc = context.getXtextDocument();
 					deleteLineAt(doc, doc.get().indexOf("PLAYER_CAN_PULL"));
@@ -208,7 +208,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_SOUND_NEVER_PLAYS)
 	public void removeUnreachableSound(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Remove the sound", "Nothing in this game can trigger this event.", null,
+		acceptor.accept(issue, "Remove the sound", "Deletes it: nothing in this game triggers this event.", null,
 				(IModification) context -> deleteLineAt(context.getXtextDocument(), issue.getOffset()));
 	}
 
