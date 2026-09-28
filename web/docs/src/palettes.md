@@ -13,7 +13,7 @@ player     DMG_WHITE DMG_WHITE DMG_LITE_GRAY DMG_BLACK
 
 Puedes generar el juego para la Game Boy original, usando solo los colores DMG, o para la Game Boy Color, usando los colores RGB.
 
-<img src="shots/solve-colour-grey.gif" srcset="shots/solve-colour-grey.gif 2x">
+<img srcset="shots/solve-colour-grey.gif 2x">
 
 ## Game Boy original
 
@@ -25,7 +25,7 @@ Con los colores DMG se genera una ROM `.gb`. Son los cuatro tonos de gris de la 
 
 Al generar una ROM `.gb` puedes utilizar hasta tres paletas, una para el fondo y dos para los sprites. A continuación puedes ver un ejemplo de cómo se definirían paletas de grises.
 
-<img src="shots/palettes-dmg.png" srcset="shots/palettes-dmg.png 2x">
+<img srcset="shots/palettes-dmg.png 2x">
 
 ## Game Boy Color
 
@@ -41,4 +41,4 @@ Con los colores que empiezan por `RGB_` se genera una ROM `.gbc`.
 
 Además de estos colores, también puedes utilizar códigos hexadecimales, como por ejemplo `#C0563C`. Pero ten cuidado, porque la pantalla de la consola no siempre será capaz de reproducir los mismos colores que ves en el navegador. Se pueden utilizar hasta ocho paletas para el fondo y ocho para los sprites. A continuación puedes ver un ejemplo de cómo se definirían paletas de colores.
 
-<img src="shots/palettes.png" srcset="shots/palettes.png 2x">
+<img srcset="shots/palettes.png 2x">

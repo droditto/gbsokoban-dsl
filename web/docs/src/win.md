@@ -24,7 +24,7 @@ Todas las casillas objetivo deben tener encima el objeto indicado. Con esto se p
 ALL crate ON goal
 ```
 
-<img src="shots/win-all.gif" srcset="shots/win-all.gif 2x">
+<img srcset="shots/win-all.gif 2x">
 
 Cada baldosa objetivo solo puede usarse para un tipo de objeto, como en el ejemplo de [Objetos](objects.md).
 
@@ -36,7 +36,7 @@ Funciona igual que `ALL`, salvo que la condición se cumple en cuanto un solo ob
 SOME crate ON goal
 ```
 
-<img src="shots/win-some.gif" srcset="shots/win-some.gif 2x">
+<img srcset="shots/win-some.gif 2x">
 
 También se puede usar con el jugador, para que el nivel se complete en cuanto llegue a una casilla, como una salida.
 
@@ -44,7 +44,7 @@ También se puede usar con el jugador, para que el nivel se complete en cuanto l
 SOME PLAYER ON exit
 ```
 
-<img src="shots/win-player.gif" srcset="shots/win-player.gif 2x">
+<img srcset="shots/win-player.gif 2x">
 
 ## NO
 
@@ -54,7 +54,7 @@ SOME PLAYER ON exit
 NO crate
 ```
 
-<img src="shots/win-no-crate.gif" srcset="shots/win-no-crate.gif 2x">
+<img srcset="shots/win-no-crate.gif 2x">
 
 Con una baldosa, la condición es que no quede ninguna de ese tipo. Por ejemplo, que el jugador tenga que caminar por todas las baldosas con `COLLAPSES INTO` hasta que desaparezcan, o rellenar con objetos todas las baldosas con `FILLS INTO`.
 
@@ -62,4 +62,4 @@ Con una baldosa, la condición es que no quede ninguna de ese tipo. Por ejemplo,
 NO hole
 ```
 
-<img src="shots/win-no-hole.gif" srcset="shots/win-no-hole.gif 2x">
+<img srcset="shots/win-no-hole.gif 2x">

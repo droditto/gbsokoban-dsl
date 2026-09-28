@@ -2,7 +2,7 @@
 
 GBSokoban es un lenguaje específico de dominio para crear juegos del género Sokoban para la Game Boy. En este editor web puedes escribir tu juego en la parte de la izquierda, compilarlo con el botón **Compilar** de la barra superior y jugarlo al momento en el emulador que se encuentra a la derecha.
 
-<img src="shots/editor.png" srcset="shots/editor.png 2x">
+<img srcset="shots/editor.png 2x">
 
 Para facilitar la programación en este lenguaje, el editor ofrece algunas ayudas a la edición. Las principales son el content assist y los quick fixes, que se explican a continuación.
 

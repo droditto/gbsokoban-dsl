@@ -20,6 +20,6 @@ LEGEND
 
 Pulsa `Ctrl + Espacio` en una línea nueva y el editor te sugerirá un carácter que no esté siendo usado.
 
-<img src="shots/assist-legend-symbol.png" srcset="shots/assist-legend-symbol.png 2x">
+<img srcset="shots/assist-legend-symbol.png 2x">
 
 </div>

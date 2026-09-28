@@ -6,7 +6,7 @@ Para usarlo, importa los proyectos en Eclipse, ejecuta `GenerateGBSokoban.mwe2` 
 
 ## Despliegue local
 
-Requiere Java 21, Maven, Node.js y `make`, y mdBook para la documentación.
+Funciona en macOS y Linux. Requiere Java 21, Maven, Node.js 18 o superior, `make` y `curl`.
 
 ```sh
 ./setup.sh
@@ -14,4 +14,4 @@ cd web
 npm run dev
 ```
 
-`setup.sh` compila el lenguaje, descarga GBDK-2020 si hace falta e instala las dependencias. El editor se abre en http://localhost:5173.
+`setup.sh` compila el lenguaje, descarga GBDK-2020 y mdBook si hace falta, instala las dependencias y genera la documentación. El editor se abre en http://localhost:5173.

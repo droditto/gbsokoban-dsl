@@ -29,7 +29,7 @@ Para optimizar la memoria de vídeo, lo habitual es reutilizar la animación de 
 
 Pulsa `Ctrl + Espacio` después de la dirección y el editor te sugerirá `MIRROR` con la dirección contraria.
 
-<img src="shots/assist-mirror.png" srcset="shots/assist-mirror.png 2x">
+<img srcset="shots/assist-mirror.png 2x">
 
 </div>
 
@@ -39,13 +39,13 @@ A continuación se explican los tres tipos de animaciones. En los ejemplos, la f
 
 `WALK` es una animación obligatoria. Es la que se utiliza cuando el jugador se está moviendo por el nivel.
 
-<img src="shots/player-walk.gif" srcset="shots/player-walk.gif 2x">
+<img srcset="shots/player-walk.gif 2x">
 
 ## PUSH
 
 `PUSH` es una animación opcional que se utiliza cuando el jugador está empujando un objeto o caminando contra una baldosa con el modificador `BLOCKS`. En caso de no definirla, se reutilizará la animación de caminar.
 
-<img src="shots/player-push.gif" srcset="shots/player-push.gif 2x">
+<img srcset="shots/player-push.gif 2x">
 
 ## PULL
 

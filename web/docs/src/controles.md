@@ -13,16 +13,16 @@ Además, cualquier juego generado trae por defecto los siguientes menús, que no
 
 Dentro de un nivel, pulsa Start para que aparezca el menú de pausa, desde el que podrás reiniciar el nivel en caso de que te hayas quedado atascado, o ir al selector de niveles si no lo has deshabilitado con `NO_LEVEL_SELECT`.
 
-<img src="shots/menu-pause.png" srcset="shots/menu-pause.png 2x">
+<img srcset="shots/menu-pause.png 2x">
 
 ## Selector de niveles
 
 Tras elegir SELECT en el menú de pausa o al superar un nivel, estarás en el selector de niveles. Sabrás que estás en él porque, en vez de MOVES, aparecerá BEST a la izquierda de la puntuación, indicando tu mejor puntuación en ese nivel. Muévete con la cruceta para cambiar de nivel, que se indica con STAGE seguido de su número, y pulsa A para jugarlo.
 
-<img src="shots/menu-select.png" srcset="shots/menu-select.png 2x">
+<img srcset="shots/menu-select.png 2x">
 
 ## Nivel superado
 
 Cuando superes un nivel, aparecerá un menú en el que podrás elegir NEXT para continuar con el siguiente nivel o SELECT para ir al selector de niveles. Además de la puntuación con la que has terminado el nivel, se mostrará también tu mejor puntuación.
 
-<img src="shots/menu-clear.png" srcset="shots/menu-clear.png 2x">
+<img srcset="shots/menu-clear.png 2x">

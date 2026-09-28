@@ -39,6 +39,6 @@ MENU_OK   NR1   0 129  67   0 134
 
 Pulsa `Ctrl + Espacio` en el primer número y el editor te sugerirá el valor que necesita el canal.
 
-<img src="shots/assist-sound.png" srcset="shots/assist-sound.png 2x">
+<img srcset="shots/assist-sound.png 2x">
 
 </div>

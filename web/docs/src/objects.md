@@ -15,4 +15,4 @@ blue_crate USES blue_crate_art ON_GOAL blue_crate_on_goal_art
 
 Puedes tener varios objetos, cada uno con su casilla objetivo correspondiente, y utilizarlo como condición de victoria. Por ejemplo, que todas las cajas naranjas tengan que ir a la casilla objetivo naranja y todas las azules a la azul.
 
-<img src="shots/objects-colors.gif" srcset="shots/objects-colors.gif 2x">
+<img srcset="shots/objects-colors.gif 2x">

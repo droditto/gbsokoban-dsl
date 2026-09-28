@@ -19,7 +19,7 @@ goal  "." USES goal_art
 
 Pulsa `Ctrl + Espacio` después de haber elegido el nombre de tu baldosa y el editor te sugerirá un carácter que no esté siendo usado.
 
-<img src="shots/assist-tile-symbol.png" srcset="shots/assist-tile-symbol.png 2x">
+<img srcset="shots/assist-tile-symbol.png 2x">
 
 </div>
 
@@ -41,7 +41,7 @@ El modificador `SLIDES` hace que tanto el jugador como los objetos resbalen. El 
 ice "~" USES ice_art SLIDES
 ```
 
-<img src="shots/tile-slides.gif" srcset="shots/tile-slides.gif 2x">
+<img srcset="shots/tile-slides.gif 2x">
 
 ## DESTROYS
 
@@ -51,7 +51,7 @@ Cuando un objeto entra en una casilla con el modificador `DESTROYS`, desaparece.
 pit "!" USES pit_art DESTROYS
 ```
 
-<img src="shots/tile-destroys.gif" srcset="shots/tile-destroys.gif 2x">
+<img srcset="shots/tile-destroys.gif 2x">
 
 ## COLLAPSES INTO
 
@@ -61,7 +61,7 @@ El modificador `COLLAPSES INTO` transforma una baldosa en otra cuando el jugador
 crumble "%" USES crumble_art COLLAPSES INTO pit
 ```
 
-<img src="shots/tile-collapses.gif" srcset="shots/tile-collapses.gif 2x">
+<img srcset="shots/tile-collapses.gif 2x">
 
 ## FILLS INTO
 
@@ -71,7 +71,7 @@ El modificador `FILLS INTO` funciona de forma similar a `DESTROYS`, pero al empu
 hole "H" USES hole_art FILLS INTO floor
 ```
 
-<img src="shots/tile-fills.gif" srcset="shots/tile-fills.gif 2x">
+<img srcset="shots/tile-fills.gif 2x">
 
 ## CARRIES
 
@@ -81,4 +81,4 @@ El modificador `CARRIES` funciona de forma similar a `SLIDES`, pero en vez de ma
 beltRight ">" USES beltRight_art CARRIES RIGHT
 ```
 
-<img src="shots/tile-carries.gif" srcset="shots/tile-carries.gif 2x">
+<img srcset="shots/tile-carries.gif 2x">

@@ -16,7 +16,7 @@ NO_LEVEL_SELECT
 
 Si defines título, autor o ambos, el juego empezará desde una pantalla de título. De no definir ninguno de los dos, el juego empezará directamente en el primer nivel.
 
-<img src="shots/titles.png" srcset="shots/titles.png 2x">
+<img srcset="shots/titles.png 2x">
 
 Cada palabra debe tener a lo sumo 20 caracteres, que es el máximo que cabe en una línea. Las frases con varias palabras se reparten de forma automática en varias líneas, y con `\n` puedes saltar de línea tú mismo. Únicamente se mostrarán letras sin tilde, números y espacios, por lo que ten cuidado con los caracteres especiales.
 
@@ -29,7 +29,7 @@ Cada palabra debe tener a lo sumo 20 caracteres, que es el máximo que cabe en u
 
 Pulsa `Ctrl + Espacio` después de `MOVE_SPEED` y el editor te sugerirá el valor por defecto.
 
-<img src="shots/assist-speed.png" srcset="shots/assist-speed.png 2x">
+<img srcset="shots/assist-speed.png 2x">
 
 </div>
 
@@ -42,7 +42,7 @@ Pulsa `Ctrl + Espacio` después de `MOVE_SPEED` y el editor te sugerirá el valo
 
 Pulsa `Ctrl + Espacio` después de `ANIM_SPEED` y el editor te sugerirá el valor calculado.
 
-<img src="shots/assist-anim-speed.png" srcset="shots/assist-anim-speed.png 2x">
+<img srcset="shots/assist-anim-speed.png 2x">
 
 </div>
 
@@ -50,7 +50,7 @@ Pulsa `Ctrl + Espacio` después de `ANIM_SPEED` y el editor te sugerirá el valo
 
 `ENDING` es el texto que aparece al superar el último nivel, siempre y cuando se hayan superado todos los niveles anteriores. De no definir una pantalla de fin con `ENDING`, el juego volverá a la pantalla de título al terminar el último nivel.
 
-<img src="shots/ending.png" srcset="shots/ending.png 2x">
+<img srcset="shots/ending.png 2x">
 
 Al igual que en la pantalla de título, evita utilizar palabras de más de 20 caracteres y utiliza solo letras sin tilde, números y espacios.
 
