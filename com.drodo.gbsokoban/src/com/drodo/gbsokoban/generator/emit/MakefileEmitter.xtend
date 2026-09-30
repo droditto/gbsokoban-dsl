@@ -45,8 +45,6 @@ class MakefileEmitter {
 		«ENDIF»
 		SRCS = $(addprefix $(SRCDIR)/,«sources.sort.join(" ")»)
 
-		«IF plan.palette.hasColor»
-		«ENDIF»
 		CART = -Wm-yn$(TITLE)«IF plan.palette.hasColor» -Wm-yc«ENDIF» -Wm-yt«IF plan.needsSave»0x1B -Wm-ya1«ELSE»0x00«ENDIF» -Wm-yoA
 
 		LCCFLAGS = -I$(SRCDIR) $(CART) -Wf--max-allocs-per-node50000

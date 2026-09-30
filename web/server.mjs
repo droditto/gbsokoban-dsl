@@ -71,7 +71,7 @@ const server = createServer(async (request, response) => {
 			return await build(request, response);
 		}
 
-		if (SERVE_DIST) return serveStatic(url.pathname, response);
+		if (SERVE_DIST) return serveStatic(url.pathname, request, response);
 
 		response.writeHead(404).end();
 	} catch (error) {
@@ -84,13 +84,23 @@ function json(response, code, body) {
 	response.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }).end(JSON.stringify(body));
 }
 
-function serveStatic(pathname, response, root = join(HERE, 'dist')) {
+function serveStatic(pathname, request, response, root = join(HERE, 'dist')) {
 	let file = join(root, pathname.slice(1));
-	if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
+	if (existsSync(file) && statSync(file).isDirectory()) {
+		if (!pathname.endsWith('/')) return response.writeHead(301, { location: pathname + '/' }).end();
+		file = join(file, 'index.html');
+	}
 	if (!file.startsWith(root) || !existsSync(file)) {
 		return response.writeHead(404).end('No se ha encontrado');
 	}
-	response.writeHead(200, { 'content-type': CONTENT_TYPES[extname(file)] ?? 'application/octet-stream' });
+	const modified = statSync(file).mtime.toUTCString();
+	const headers = {
+		'content-type': CONTENT_TYPES[extname(file)] ?? 'application/octet-stream',
+		'cache-control': /^\/assets\/|-[0-9a-f]{8}\.[\w.]+$/.test(pathname) ? 'public, max-age=31536000, immutable' : 'no-cache',
+		'last-modified': modified
+	};
+	if (request.headers['if-modified-since'] === modified) return response.writeHead(304, headers).end();
+	response.writeHead(200, headers);
 	createReadStream(file).pipe(response);
 }
 

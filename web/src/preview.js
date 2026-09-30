@@ -78,25 +78,32 @@ class Row extends WidgetType {
 	}
 }
 
+function withoutComments(text) {
+	return text.replace(/"(?:\\.|[^"\\\n])*"|\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$)/g,
+		(match) => (match.startsWith('"') ? match : match.replace(/[^\n]/g, ' ')));
+}
+
 function scan(doc) {
 	const palettes = new Map();
 	const widgets = [];
+	const lines = withoutComments(doc.toString()).split('\n');
 	let section = null;
 	let colours = null;
 
 	for (let number = 1; number <= doc.lines; number++) {
 		const line = doc.line(number);
-		const trimmed = line.text.trim();
+		const text = lines[number - 1];
+		const trimmed = text.trim();
 
 		if (SECTIONS.has(trimmed)) {
 			section = trimmed;
 			colours = null;
 			continue;
 		}
-		if (!trimmed || trimmed.startsWith('//') || /^=+$/.test(trimmed)) continue;
+		if (!trimmed || /^=+$/.test(trimmed)) continue;
 
 		if (section === 'PALETTES') {
-			const words = [...line.text.matchAll(/\S+/g)];
+			const words = [...text.matchAll(/\S+/g)];
 			const named = [];
 			for (const word of words.slice(1)) {
 				const colour = colourOf(word[0]);
@@ -110,13 +117,13 @@ function scan(doc) {
 
 		if (section !== 'TEXTURES') continue;
 
-		const header = /^\s*\w+\s+USES\s+(\w+)/.exec(line.text);
+		const header = /^\s*\w+\s+USES\s+(\w+)/.exec(text);
 		if (header) {
 			colours = palettes.get(header[1]) ?? null;
 			continue;
 		}
 
-		const row = /"([^"]*)"/.exec(line.text);
+		const row = /"([^"]*)"/.exec(text);
 		if (row?.[1] && colours) widgets.push({ at: line.to, widget: new Row(row[1], colours) });
 	}
 

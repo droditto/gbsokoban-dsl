@@ -5,7 +5,8 @@ const docsIndex = {
 	name: 'docs-index',
 	configureServer(server) {
 		server.middlewares.use((request, response, next) => {
-			if (request.url === '/docs' || request.url === '/docs/') request.url = '/docs/index.html';
+			if (request.url === '/docs') return response.writeHead(301, { location: '/docs/' }).end();
+			if (request.url === '/docs/') request.url = '/docs/index.html';
 			next();
 		});
 	}
