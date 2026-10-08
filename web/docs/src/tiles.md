@@ -2,7 +2,7 @@
 
 Las baldosas son las casillas con las que se construyen los niveles. Este bloque es obligatorio y se declara con la palabra clave `TILES`.
 
-Para definir una baldosa necesitas el nombre que le quieres dar, el carácter con el que la quieres dibujar a la hora de pintar los niveles, la palabra clave `USES` seguida del nombre de la [textura](textures.md) que va a utilizar y, opcionalmente, un modificador que indica cómo interactúan los objetos y el jugador con esa baldosa. Sin un modificador, la baldosa se comportará como una casilla sin colisión, por la que el jugador y los objetos pueden pasar por encima sin problema.
+Para definir una baldosa necesitas el nombre que le quieres dar, el carácter con el que la quieres dibujar a la hora de pintar los niveles, la palabra clave `USES` seguida del nombre de la [textura](textures.md) que va a utilizar y, opcionalmente, un modificador que indica cómo interactúan los objetos y el jugador con esa baldosa. Sin un modificador, la baldosa se comportará como una casilla sin colisión, por la que pueden pasar el jugador y los objetos sin problema.
 
 ```gbsoko
 ======
@@ -35,7 +35,7 @@ wall "#" USES wall_art BLOCKS
 
 ## SLIDES
 
-El modificador `SLIDES` hace que tanto el jugador como los objetos resbalen. El jugador o el objeto que entra en la casilla resbala en la misma dirección en la que entra, hasta chocar con algo o salir del hielo.
+El modificador `SLIDES` hace que tanto el jugador como los objetos resbalen. El jugador o el objeto que entra en la casilla resbala en la misma dirección en la que entra, hasta chocar con algo o salir de la baldosa.
 
 ```gbsoko
 ice "~" USES ice_art SLIDES
@@ -65,7 +65,7 @@ crumble "%" USES crumble_art COLLAPSES INTO pit
 
 ## FILLS INTO
 
-El modificador `FILLS INTO` funciona de forma similar a `DESTROYS`, pero al empujar un objeto dentro, la casilla se rellena y se transforma en otra baldosa, como con `COLLAPSES INTO` pero consumiendo el objeto en el proceso. Cuidado, porque este modificador también puede matar al jugador y reiniciar el nivel.
+El modificador `FILLS INTO` funciona de forma similar a `DESTROYS`, ya que el objeto que entra en la casilla desaparece. La diferencia es que, además, la casilla se rellena y se transforma en otra baldosa, como ocurre con `COLLAPSES INTO`. Cuidado, porque este modificador también puede matar al jugador y reiniciar el nivel.
 
 ```gbsoko
 hole "H" USES hole_art FILLS INTO floor

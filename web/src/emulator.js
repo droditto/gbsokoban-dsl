@@ -153,11 +153,16 @@ class Emulator {
 	}
 }
 
+export function stop(canvas) {
+	running?.stop();
+	running = null;
+	canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
 export async function play(canvas, rom) {
 	const module = await loadBinjgb();
-	running?.stop();
 	// Cleared first, so a rejected ROM is not stopped twice.
-	running = null;
+	stop(canvas);
 	running = new Emulator(module, rom, canvas);
 	canvas.focus();
 }

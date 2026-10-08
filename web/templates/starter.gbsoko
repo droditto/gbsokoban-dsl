@@ -1,6 +1,5 @@
 TITLE "SOKOBAN"
 AUTHOR "TU NOMBRE"
-MOVE_SPEED 8
 ENDING "YOU WIN\nSEE YOU AGAIN"
 
 =========
@@ -106,46 +105,6 @@ walk_up_2 USES blues
 "..33.23."
 ".....33."
 
-push_right_1 USES blues
-"...22.3."
-"..2223.."
-"..1111.1"
-"...22231"
-"..233..."
-"..222..."
-"322.2..."
-".3..33.."
-
-push_right_2 USES blues
-"......3."
-"...223.."
-"..2111.1"
-"...22231"
-"..233..."
-"..2222.."
-"32..32.."
-".33..33."
-
-push_up_1 USES blues
-".11..11."
-".3....3."
-".2.11.2."
-".232232."
-".232232."
-"..2333.."
-".32.33.."
-".33....."
-
-push_up_2 USES blues
-".11..11."
-".3....3."
-".2.11.2."
-".232232."
-".232232."
-"..3332.."
-"..33.23."
-".....33."
-
 ======
 TILES
 ======
@@ -168,11 +127,6 @@ WALK RIGHT walk_right_1 walk_right_2
 WALK LEFT  MIRROR RIGHT
 WALK UP    walk_up_1 walk_up_2
 WALK DOWN  MIRROR UP
-
-PUSH RIGHT push_right_1 push_right_2
-PUSH LEFT  MIRROR RIGHT
-PUSH UP    push_up_1 push_up_2
-PUSH DOWN  MIRROR UP
 
 =======
 LEGEND

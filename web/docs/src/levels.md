@@ -1,6 +1,6 @@
 # Niveles
 
-Los niveles son un bloque obligatorio que se declara con la palabra clave `LEVELS`. Para definir un nivel escribe la palabra clave `LEVEL`, seguida de las cadenas con los caracteres que se han definido previamente en las [baldosas](tiles.md) o en la [leyenda](legend.md).
+El bloque de niveles es obligatorio y se declara con la palabra clave `LEVELS`. Para definir un nivel escribe la palabra clave `LEVEL`, seguida de las cadenas con los caracteres que se han definido previamente en las [baldosas](tiles.md) o en la [leyenda](legend.md).
 
 Un nivel tiene que tener un único jugador, y las cadenas que lo componen pueden ser de distintas longitudes. Todo lo que queda fuera de lo que dibujas, tanto al final de las cadenas cortas como en el resto de la pantalla, es sólido y se pinta con la textura de la primera baldosa que hayas definido, por lo que se recomienda que esa primera baldosa sea la que vas a utilizar de suelo o de pared.
 

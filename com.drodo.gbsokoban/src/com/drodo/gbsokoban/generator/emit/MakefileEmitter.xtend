@@ -16,20 +16,7 @@ class MakefileEmitter {
 	def String makefile(GamePlan plan, String project, List<String> sources) {
 		val tab = "\t"
 		'''
-		GBDK_SEARCH = \
-		    $(HOME)/gbdk \
-		    $(HOME)/Development/gbdk \
-		    $(HOME)/Documents/gbdk \
-		    $(HOME)/Downloads/gbdk \
-		    /opt/gbdk \
-		    /usr/local/gbdk
-
-		GBDK_HOME ?= $(patsubst %/bin/lcc,%,$(firstword $(wildcard $(addsuffix /bin/lcc,$(GBDK_SEARCH)))))
-
-		ifeq ($(wildcard $(GBDK_HOME)/bin/lcc),)
-		$(error Could not find GBDK. Export GBDK_HOME=/path/to/gbdk, or install it in one of: $(GBDK_SEARCH))
-		endif
-
+		GBDK_HOME ?= $(HOME)/gbdk
 		LCC = $(GBDK_HOME)/bin/lcc
 
 		ROM = «project»
@@ -49,13 +36,13 @@ class MakefileEmitter {
 
 		LCCFLAGS = -I$(SRCDIR) $(CART) -Wf--max-allocs-per-node50000
 
-		.PHONY: all clean FORCE
+		.PHONY: all clean
 
 		all: $(BIN)
 
 		ADDRESSABLE = 32768
 
-		$(BIN): $(SRCS) FORCE
+		$(BIN): $(SRCS) $(wildcard $(SRCDIR)/*.h)
 		«tab»$(LCC) $(LCCFLAGS) -o $@ $(SRCS)
 		«tab»@size=`wc -c < $@`; \
 		«tab»if [ $$size -gt $(ADDRESSABLE) ]; then \
@@ -64,8 +51,6 @@ class MakefileEmitter {
 		«tab»«tab»echo "Shorten the game: fewer levels, smaller ones, or less art."; \
 		«tab»«tab»exit 1; \
 		«tab»fi
-
-		FORCE:
 
 		clean:
 		«tab»rm -f $(ROM).gb $(ROM).gbc $(ROM).ihx $(ROM).map $(ROM).noi $(ROM).sym $(ROM).lk $(ROM).cdb $(ROM).adb

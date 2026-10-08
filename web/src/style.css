@@ -148,11 +148,39 @@ canvas {
 	background: #000;
 }
 
-.study .button {
-	display: block;
-	width: fit-content;
-	margin-top: var(--tight);
+dialog {
+	max-width: 520px;
+	padding: var(--pad) calc(3 * var(--pad));
+	border: 1px solid var(--border);
+	border-radius: var(--tight);
+	background: var(--background);
+	color: var(--text);
+	font: var(--font);
 }
+
+dialog::backdrop { background: rgb(0 0 0 / 0.6); }
+
+dialog h2 {
+	font-size: 20px;
+	font-weight: 400;
+	text-align: center;
+}
+
+dialog p { text-align: justify; }
+
+dialog .choices {
+	display: flex;
+	justify-content: center;
+	gap: calc(3 * var(--pad));
+	margin: calc(2 * var(--pad)) 0 var(--pad);
+}
+
+.study {
+	margin-right: var(--pad);
+	padding-right: var(--pad);
+	border-right: 1px solid var(--dim);
+}
+.study[hidden] { display: none; }
 
 body.resizing { user-select: none; }
 body.resizing main * { pointer-events: none; }

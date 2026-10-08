@@ -7,3 +7,4 @@ build
 web/dist
 web/public/docs
 .git
+web/data

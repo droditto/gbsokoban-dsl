@@ -35,6 +35,7 @@ COPY --from=build /app/web/server.mjs /app/web/package.json /app/web/
 COPY --from=build /app/web/node_modules /app/web/node_modules
 COPY --from=build /app/web/templates /app/web/templates
 COPY --from=build /app/web/dist /app/web/dist
+RUN mkdir /app/web/data && chown gbsokoban /app/web/data
 
 USER gbsokoban
 WORKDIR /app/web

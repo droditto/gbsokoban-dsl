@@ -18,7 +18,7 @@ Si defines título, autor o ambos, el juego empezará desde una pantalla de tít
 
 <img srcset="shots/titles.png 2x">
 
-Cada palabra debe tener a lo sumo 20 caracteres, que es el máximo que cabe en una línea. Las frases con varias palabras se reparten de forma automática en varias líneas, y con `\n` puedes saltar de línea tú mismo. Únicamente se mostrarán letras sin tilde, números y espacios, por lo que ten cuidado con los caracteres especiales.
+Cada palabra debe tener a lo sumo 20 caracteres, que es el máximo que cabe en una línea. Las frases con varias palabras se reparten de forma automática en varias líneas, y con `\n` puedes saltar de línea tú mismo. Únicamente se mostrarán letras sin tilde, números y espacios, así que ten cuidado con los caracteres especiales.
 
 ## MOVE_SPEED
 

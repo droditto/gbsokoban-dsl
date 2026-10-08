@@ -2,6 +2,7 @@ package com.drodo.gbsokoban.ide.contentassist;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.CrossReference;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext;
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry;
@@ -32,7 +33,8 @@ public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvi
 	@Override
 	protected void _createProposals(Assignment assignment, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
-		super._createProposals(assignment, context, acceptor);
+		if (assignment.getTerminal() instanceof CrossReference)
+			super._createProposals(assignment, context, acceptor);
 		EObject model = context.getCurrentModel();
 		Game game = model == null ? null : EcoreUtil2.getContainerOfType(model, Game.class);
 

@@ -26,7 +26,7 @@ ALL crate ON goal
 
 <img srcset="shots/win-all.gif 2x">
 
-Cada baldosa objetivo solo puede usarse para un tipo de objeto, como en el ejemplo de [Objetos](objects.md).
+Cada casilla objetivo solo puede usarse para un tipo de objeto, como en el ejemplo de [Objetos](objects.md).
 
 ## SOME
 

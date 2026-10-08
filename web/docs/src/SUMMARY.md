@@ -18,3 +18,7 @@
 # El emulador
 
 - [Controles y menús](controles.md)
+
+# El estudio
+
+- [Tarea](tarea.md)

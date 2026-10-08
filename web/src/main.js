@@ -6,11 +6,14 @@ import { languageServer } from '@marimo-team/codemirror-languageserver';
 
 import { gbsoko } from './gbsoko.js';
 import { previews } from './preview.js';
-import { play } from './emulator.js';
+import { play, stop } from './emulator.js';
 import { makeResizable } from './splitter.js';
 import { readFromUrl, linkTo } from './share.js';
 import './style.css';
 
+const consent = document.querySelector('#consent');
+const welcome = document.querySelector('#welcome');
+const study = document.querySelectorAll('.study');
 const status = document.querySelector('#status');
 const log = document.querySelector('#log');
 const screen = document.querySelector('#screen');
@@ -22,17 +25,38 @@ const pullHint = document.querySelector('#pull');
 
 let rom = null;
 let romName;
+let joining = null;
+
+const opened = fetch('/api/session').then((response) => response.json());
+const post = (path, body) =>
+	fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 
 function say(text, failed = false) {
 	status.textContent = text;
 	status.classList.toggle('warning', failed);
 }
 
+function participate(number) {
+	joining = opened.then(async (session) => {
+		const response = await post('/api/participate', { session: session.session, number });
+		const body = await response.json();
+		if (!response.ok) throw new Error(body.error);
+		sessionStorage.setItem('participant', body.number);
+		for (const label of document.querySelectorAll('.participant')) label.textContent = body.number;
+		for (const element of study) element.hidden = false;
+		if (!number) welcome.showModal();
+	});
+	joining.catch((error) => say(String(error?.message ?? error), true));
+}
+
+function track(type, detail) {
+	joining?.then(() => opened).then((session) => post('/api/event', { session: session.session, type, detail }));
+}
+
 async function start() {
 	makeResizable(document.querySelector('#splitter'));
 
-	say('Abriendo la sesión');
-	const session = await fetch('/api/session').then((response) => response.json());
+	const session = await opened;
 
 	const scheme = location.protocol === 'https:' ? 'wss' : 'ws';
 
@@ -46,15 +70,22 @@ async function start() {
 
 	const view = new EditorView({
 		state: EditorState.create({
-			doc: (await readFromUrl()) ?? session.source,
+			doc: sessionStorage.getItem('source') ?? (await readFromUrl()) ?? session.source,
 			extensions: [
 				basicSetup,
+				EditorView.theme({ '.cm-tooltip-autocomplete > ul > li[aria-selected]': { backgroundColor: '#347', color: 'white' } }),
 				oneDark,
 				gbsoko,
 				previews,
 				server,
 				// On document.body, so tooltips on the first line are not clipped.
-				tooltips({ position: 'fixed', parent: document.body })
+				tooltips({ position: 'fixed', parent: document.body }),
+				EditorView.updateListener.of((update) => {
+					if (update.docChanged) sessionStorage.setItem('source', update.state.doc.toString());
+					for (const transaction of update.transactions)
+						if (transaction.isUserEvent('input.complete'))
+							transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => track('completion', text.line(1).text));
+				})
 			]
 		}),
 		parent: document.querySelector('#editor')
@@ -62,22 +93,28 @@ async function start() {
 
 	say('Pulsa Compilar para probar tu juego');
 
+	view.dom.addEventListener('keydown', (event) => {
+		if (event.ctrlKey && event.code === 'Space') track('assist');
+	});
+	document.addEventListener('mousedown', (event) => {
+		const fix = event.target.closest('.cm-diagnosticAction');
+		if (fix) track('fix', fix.textContent);
+	}, true);
+
 	playButton.addEventListener('click', async () => {
 		playButton.disabled = true;
 		downloadButton.disabled = true;
+		hint.hidden = true;
+		stop(screen);
 		say('Compilando');
 		log.textContent = '';
 		try {
 			const source = view.state.doc.toString();
-			const response = await fetch('/api/build', {
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ session: session.session, source })
-			});
+			const response = await post('/api/build', { session: session.session, source });
 			const body = await response.json();
 			if (!response.ok) {
 				say(body.error ?? 'No se ha podido compilar', true);
-				log.textContent = body.issues ?? body.log ?? '';
+				log.textContent = body.log ?? '';
 				return;
 			}
 			rom = Uint8Array.from(atob(body.bytes), (c) => c.charCodeAt(0));
@@ -104,7 +141,7 @@ async function start() {
 		} catch {
 			// Without HTTPS there is no clipboard, so the link goes in the address bar.
 			history.replaceState(null, '', await link);
-			say('El enlace está en la barra de direcciones');
+			say('Copia el enlace de la barra de direcciones');
 		}
 	});
 
@@ -116,5 +153,13 @@ async function start() {
 		URL.revokeObjectURL(anchor.href);
 	});
 }
+
+consent.addEventListener('close', () => {
+	if (consent.returnValue !== 'yes' && consent.returnValue !== 'no') return consent.showModal();
+	sessionStorage.setItem('consent', consent.returnValue);
+	if (consent.returnValue === 'yes') participate();
+});
+if (!sessionStorage.getItem('consent')) consent.showModal();
+else if (sessionStorage.getItem('consent') === 'yes') participate(Number(sessionStorage.getItem('participant')));
 
 start().catch((error) => say(String(error?.message ?? error), true));

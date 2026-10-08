@@ -17,7 +17,7 @@ Dentro de un nivel, pulsa Start para que aparezca el menú de pausa, desde el qu
 
 ## Selector de niveles
 
-Tras elegir SELECT en el menú de pausa o al superar un nivel, estarás en el selector de niveles. Sabrás que estás en él porque, en vez de MOVES, aparecerá BEST a la izquierda de la puntuación, indicando tu mejor puntuación en ese nivel. Muévete con la cruceta para cambiar de nivel, que se indica con STAGE seguido de su número, y pulsa A para jugarlo.
+Tras elegir SELECT en el menú de pausa o al superar un nivel, estarás en el selector de niveles. Sabrás que estás en él porque, en vez de MOVES, aparecerá BEST junto a tu mejor puntuación en ese nivel. Muévete con la cruceta para cambiar de nivel, que se indica con STAGE seguido de su número, y pulsa A para jugarlo.
 
 <img srcset="shots/menu-select.png 2x">
 

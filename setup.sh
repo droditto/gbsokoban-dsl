@@ -7,10 +7,6 @@ GBDK_VERSION=4.4.0
 MDBOOK_VERSION=v0.5.4
 GBDK_HOME=${GBDK_HOME:-$HOME/gbdk}
 
-for tool in java mvn node make curl; do
-	command -v "$tool" >/dev/null 2>&1 || { echo "Missing $tool" >&2; exit 1; }
-done
-
 echo "Building the language and the language server"
 mvn -B -q -f "$REPO/pom.xml" -DskipTests package
 

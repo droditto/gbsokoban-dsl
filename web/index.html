@@ -8,8 +8,33 @@
 	<link rel="shortcut icon" href="/favicon.png">
 </head>
 <body>
+	<dialog id="consent">
+		<form method="dialog">
+			<h2>Estudio de usabilidad de GBSokoban</h2>
+			<p>Este editor forma parte de un estudio de usabilidad sobre GBSokoban, un lenguaje específico de dominio para crear juegos del género Sokoban para la Game Boy.</p>
+			<p>Si participas, el editor guardará de forma anónima el código de tu juego cada vez que compiles, los errores que aparezcan y las ayudas que uses.</p>
+			<div class="choices">
+				<button value="yes">Participar en el estudio</button>
+				<button value="no">Solo quiero usar el editor</button>
+			</div>
+		</form>
+	</dialog>
+	<dialog id="welcome">
+		<form method="dialog">
+			<h2>Eres el participante número <span class="participant"></span></h2>
+			<p>Completa las cuatro fases de la <a class="button" href="/docs/tarea.html" target="_blank" rel="noopener">Tarea</a> y, al terminar, rellena el <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLScQjjwggVqMfEQCX6clJkWnUozPpjn1ivpxVw8U4goH7fMeAQ/viewform" target="_blank" rel="noopener">Cuestionario</a>. Apunta tu número de participante, porque es lo primero que se te pedirá. No cierres esta pestaña hasta terminar o perderás tu número de participante y tu progreso.</p>
+			<div class="choices">
+				<button autofocus>Empezar</button>
+			</div>
+		</form>
+	</dialog>
 	<header>
 		<h1>GBSokoban DSL</h1>
+		<div class="actions study" hidden>
+			<span>Participante <span class="participant"></span></span>
+			<a class="button" href="/docs/tarea.html" target="_blank" rel="noopener">Tarea</a>
+			<a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLScQjjwggVqMfEQCX6clJkWnUozPpjn1ivpxVw8U4goH7fMeAQ/viewform" target="_blank" rel="noopener">Cuestionario</a>
+		</div>
 		<div class="actions">
 			<button id="play">Compilar</button>
 			<button id="download" disabled>Exportar</button>
@@ -26,15 +51,11 @@
 				Flechas para moverte por el nivel y por los menús<br>
 				X para confirmar<br>
 				Z para volver atrás<br>
-				<span id="pull" hidden>Mantén pulsada la Z para arrastrar un objeto<br></span>
+				<span id="pull" hidden>Mantén pulsada la Z para tirar de un objeto<br></span>
 				Enter para empezar el juego y para abrir y cerrar el menú de pausa
 			</p>
 			<p id="status"></p>
 			<pre id="log"></pre>
-			<p class="study">Este editor forma parte de un estudio de usabilidad sobre lenguajes
-				específicos de dominio para hacer juegos Sokoban en Game Boy.
-				<a class="button" href="https://docs.google.com/forms/" target="_blank" rel="noopener">Responder al cuestionario</a>
-			</p>
 		</aside>
 	</main>
 	<script type="module" src="/src/main.js"></script>

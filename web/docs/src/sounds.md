@@ -15,7 +15,7 @@ Opcionalmente, puedes añadir sonidos al juego para ciertas acciones. El bloque 
 
 Para declarar un sonido, escribe la palabra clave de la acción, seguida del canal por el que quieres que se reproduzca, de los cuatro que tiene el hardware de la Game Boy (`NR1` y `NR2` son de onda cuadrada, `NR3` de onda programable y `NR4` de ruido), y de cinco números que concretan cómo va a sonar.
 
-Es muy difícil adivinar sonidos de la nada y probarlos resultaría engorroso, por lo que se recomienda utilizar la ROM <a href="sound.gb" download>sound.gb</a> en un emulador. O directamente puedes copiar los que tienes aquí de ejemplo.
+Es muy difícil adivinar sonidos de la nada y probarlos resultaría engorroso, por lo que se recomienda utilizar la ROM <a href="sound.gb" download>sound.gb</a> en un emulador, o copiar directamente los del ejemplo.
 
 ```gbsoko
 =======

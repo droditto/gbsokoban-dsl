@@ -35,8 +35,7 @@ public final class EngineSources {
 	public static String read(String name) {
 		try (InputStream in = EngineSources.class.getResourceAsStream(BASE + name)) {
 			if (in == null)
-				throw new IllegalStateException("Engine resource not on the classpath: " + BASE + name
-						+ ". Check that the engine folder is inside a source folder and gets copied to the output folder.");
+				throw new IllegalStateException("Engine resource not on the classpath: " + BASE + name);
 			return new String(in.readAllBytes(), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new IllegalStateException("Could not read engine resource " + name, e);
