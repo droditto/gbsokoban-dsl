@@ -13,4 +13,5 @@ Require-Bundle: com.drodo.gbsokoban,
  org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Export-Package: com.drodo.gbsokoban.ide.contentassist.antlr.internal,
- com.drodo.gbsokoban.ide.contentassist.antlr
+ com.drodo.gbsokoban.ide.contentassist.antlr,
+ com.drodo.gbsokoban.ide.contentassist
