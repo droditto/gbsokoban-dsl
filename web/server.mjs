@@ -37,11 +37,11 @@ async function openSession() {
 	const id = randomUUID();
 	const dir = join(ROOT, id);
 	await mkdir(dir, { recursive: true });
-	const starter = await readFile(join(HERE, 'templates', 'starter.gbsoko'), 'utf8');
-	await writeFile(join(dir, SOURCE_NAME), starter);
+	const example = await readFile(join(HERE, 'templates', 'example.gbsoko'), 'utf8');
+	await writeFile(join(dir, SOURCE_NAME), example);
 	const session = { id, dir, file: join(dir, SOURCE_NAME), building: false, seen: Date.now() };
 	sessions.set(id, session);
-	return { session, starter };
+	return { session, example };
 }
 
 const CONTENT_TYPES = {
@@ -61,12 +61,12 @@ const server = createServer(async (request, response) => {
 		const url = new URL(request.url, 'http://localhost');
 
 		if (url.pathname === '/api/session' && request.method === 'GET') {
-			const { session, starter } = await openSession();
+			const { session, example } = await openSession();
 			return json(response, 200, {
 				session: session.id,
 				rootUri: pathToFileURL(session.dir).href,
 				documentUri: pathToFileURL(session.file).href,
-				source: starter
+				source: example
 			});
 		}
 

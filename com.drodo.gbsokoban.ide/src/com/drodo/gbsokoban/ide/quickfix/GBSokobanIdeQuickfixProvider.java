@@ -1,10 +1,7 @@
 package com.drodo.gbsokoban.ide.quickfix;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.eclipse.emf.ecore.EObject;
@@ -20,127 +17,57 @@ import org.eclipse.xtext.ide.server.Document;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
-import com.drodo.gbsokoban.gBSokoban.Game;
-import com.drodo.gbsokoban.gBSokoban.LegendEntry;
 import com.drodo.gbsokoban.gBSokoban.Level;
 import com.drodo.gbsokoban.gBSokoban.PaletteDef;
-import com.drodo.gbsokoban.gBSokoban.PlayerRef;
-import com.drodo.gbsokoban.gBSokoban.Solid;
 import com.drodo.gbsokoban.gBSokoban.Texture;
-import com.drodo.gbsokoban.gBSokoban.TileDef;
-import com.drodo.gbsokoban.model.GameTextures;
-import com.drodo.gbsokoban.model.SymbolPool;
-import com.drodo.gbsokoban.util.CellGeometry;
-import com.drodo.gbsokoban.util.Palettes;
 import com.drodo.gbsokoban.validation.GBSokobanValidator;
+import com.drodo.gbsokoban.validation.QuickFixes;
 
 /** The same nine fixes as the Eclipse provider, as LSP code actions. */
 public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfixProvider {
 
 	@QuickFix(GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL)
 	public void replaceDuplicateSymbol(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Use a free character", (ITextModification) (diagnostic, object, document) -> {
-			Game game = gameOf(object);
-			if (game == null)
-				return none();
-			String name = object instanceof TileDef ? ((TileDef) object).getName() : null;
-			String free = SymbolPool.firstUnusedFor(name, SymbolPool.usedIn(game));
-			return free == null ? none() : one(diagnostic.getRange(), "\"" + free + "\"");
-		});
+		acceptor.accept("Use a free character", (ITextModification) (diagnostic, object, document) ->
+				one(diagnostic.getRange(), QuickFixes.freeSymbol(object)));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_SYMBOL_LENGTH)
 	public void trimSymbol(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Keep only the first character", (ITextModification) (diagnostic, object, document) -> {
-			String inner = document.getSubstring(diagnostic.getRange()).replace("\"", "");
-			return inner.isEmpty() ? none() : one(diagnostic.getRange(), "\"" + inner.charAt(0) + "\"");
-		});
+		acceptor.accept("Keep only the first character", (ITextModification) (diagnostic, object, document) ->
+				one(diagnostic.getRange(), QuickFixes.firstCharacter(document.getSubstring(diagnostic.getRange()))));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL)
 	public void allowPulling(DiagnosticResolutionAcceptor acceptor) {
 		acceptor.accept("Add PLAYER_CAN_PULL", (ITextModification) (diagnostic, object, document) -> {
 			Position start = new Position(0, 0);
-			return one(new Range(start, start), "PLAYER_CAN_PULL\n");
+			return one(new Range(start, start), QuickFixes.CAN_PULL_LINE);
 		});
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
 	public void addPlayerToLegend(DiagnosticResolutionAcceptor acceptor) {
 		acceptor.accept("Add a character for the player", (ITextModification) (diagnostic, object, document) -> {
-			Game game = gameOf(object);
-			if (game == null)
-				return none();
-			TileDef tile = plainTileOf(game);
-			String symbol = SymbolPool.firstUnusedFor(null, SymbolPool.usedIn(game));
-			if (tile == null || symbol == null)
-				return none();
 			Position start = diagnostic.getRange().getStart();
-			return one(new Range(start, start), "\"" + symbol + "\" = PLAYER ON " + tile.getName() + "\n");
+			return one(new Range(start, start), QuickFixes.playerLegendLine(object));
 		});
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS)
 	public void keepFirstPlayer(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Keep only the first player", rewrite(Level.class, (host, text) -> {
-			Game game = gameOf(host);
-			Set<String> players = playerSymbolsOf(game);
-			TileDef floor = plainTileOf(game);
-			if (players.isEmpty() || floor == null || floor.getSymbol() == null)
-				return null;
-			char fill = floor.getSymbol().charAt(0);
-			StringBuilder out = new StringBuilder(text);
-			boolean quoted = false;
-			boolean kept = false;
-			for (int i = 0; i < out.length(); i++) {
-				if (out.charAt(i) == '"') {
-					quoted = !quoted;
-				} else if (quoted && players.contains(String.valueOf(out.charAt(i)))) {
-					if (kept)
-						out.setCharAt(i, fill);
-					kept = true;
-				}
-			}
-			return out.toString();
-		}));
+		acceptor.accept("Keep only the first player", rewrite(Level.class, QuickFixes::keepFirstPlayer));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_TEXTURE_SIZE)
 	public void fitTextureToSize(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Resize the texture", rewrite(Texture.class, (host, text) -> {
-			int side = sideFor(host, gameOf(host));
-			List<String> lines = new ArrayList<>(List.of(text.split("\n", -1)));
-			int header = 0;
-			while (header < lines.size() && !lines.get(header).contains("USES"))
-				header++;
-			List<String> head = new ArrayList<>(lines.subList(0, Math.min(header + 1, lines.size())));
-			List<String> rows = new ArrayList<>(lines.subList(Math.min(header + 1, lines.size()), lines.size()));
-			rows.removeIf(String::isBlank);
-			String indent = rows.isEmpty() ? "" : indentOf(rows.get(0));
-			while (rows.size() > side)
-				rows.remove(rows.size() - 1);
-			for (int y = 0; y < rows.size(); y++)
-				rows.set(y, indent + quoted(fitRow(unquoted(rows.get(y)), side)));
-			while (rows.size() < side)
-				rows.add(indent + quoted(fitRow("", side)));
-			head.addAll(rows);
-			return String.join("\n", head);
-		}));
+		acceptor.accept("Resize the texture", rewrite(Texture.class, QuickFixes::fitTexture));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_PALETTE_SIZE)
 	public void fitPaletteToRegister(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Resize the palette to 4 colors", rewrite(PaletteDef.class, (host, text) -> {
-			List<String> parts = new ArrayList<>(List.of(text.trim().split("\\s+")));
-			String name = parts.remove(0);
-			if (parts.isEmpty())
-				return null;
-			while (parts.size() > Palettes.ENTRIES)
-				parts.remove(parts.size() - 1);
-			while (parts.size() < Palettes.ENTRIES)
-				parts.add(parts.get(parts.size() - 1));
-			return name + " " + String.join(" ", parts);
-		}));
+		acceptor.accept("Resize the palette to 4 colors",
+				rewrite(PaletteDef.class, (host, text) -> QuickFixes.fitPalette(text)));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS)
@@ -166,8 +93,6 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 			if (node == null)
 				return none();
 			String updated = edit.apply(host, document.getContents().substring(node.getOffset(), node.getEndOffset()));
-			if (updated == null)
-				return none();
 			Range range = new Range(document.getPosition(node.getOffset()), document.getPosition(node.getEndOffset()));
 			return one(range, updated);
 		};
@@ -181,61 +106,10 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 	}
 
 	private static List<TextEdit> one(Range range, String text) {
-		return Collections.singletonList(new TextEdit(range, text));
+		return text == null ? none() : Collections.singletonList(new TextEdit(range, text));
 	}
 
 	private static List<TextEdit> none() {
 		return Collections.emptyList();
-	}
-
-	private static Game gameOf(EObject object) {
-		return object == null ? null : EcoreUtil2.getContainerOfType(object, Game.class);
-	}
-
-	private static String indentOf(String line) {
-		return line.substring(0, line.length() - line.stripLeading().length());
-	}
-
-	private static String unquoted(String line) {
-		return line.trim().replace("\"", "");
-	}
-
-	private static String quoted(String row) {
-		return "\"" + row + "\"";
-	}
-
-	private static int sideFor(Texture texture, Game game) {
-		int stated = game == null ? 0 : GameTextures.cellPx(game);
-		if (CellGeometry.SUPPORTED_PX.contains(stated))
-			return stated;
-		return CellGeometry.nearestSupportedPx(texture.getRows().size());
-	}
-
-	private static String fitRow(String row, int side) {
-		StringBuilder out = new StringBuilder(row.length() > side ? row.substring(0, side) : row);
-		while (out.length() < side)
-			out.append('.');
-		return out.toString();
-	}
-
-	private static TileDef plainTileOf(Game game) {
-		List<TileDef> tiles = game.getTiles();
-		for (TileDef tile : tiles)
-			if (tile.getBehaviour() == null)
-				return tile;
-		for (TileDef tile : tiles)
-			if (!(tile.getBehaviour() instanceof Solid))
-				return tile;
-		return null;
-	}
-
-	private static Set<String> playerSymbolsOf(Game game) {
-		Set<String> symbols = new HashSet<>();
-		if (game == null)
-			return symbols;
-		for (LegendEntry entry : game.getLegend())
-			if (entry.getSubject() instanceof PlayerRef && entry.getSymbol() != null)
-				symbols.add(entry.getSymbol());
-		return symbols;
 	}
 }

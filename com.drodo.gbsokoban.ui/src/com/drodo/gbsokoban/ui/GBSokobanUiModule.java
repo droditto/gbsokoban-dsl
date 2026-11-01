@@ -4,8 +4,12 @@
 package com.drodo.gbsokoban.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
+import org.eclipse.xtext.ui.editor.contentassist.IContentProposalProvider;
+import org.eclipse.xtext.ui.editor.contentassist.UiToIdeContentProposalProvider;
 
 import com.drodo.gbsokoban.generator.BuildTrigger;
+import com.drodo.gbsokoban.ide.contentassist.GBSokobanIdeContentProposalProvider;
 import com.drodo.gbsokoban.ui.build.EclipseMakeTrigger;
 
 /**
@@ -19,5 +23,14 @@ public class GBSokobanUiModule extends AbstractGBSokobanUiModule {
 
 	public Class<? extends BuildTrigger> bindBuildTrigger() {
 		return EclipseMakeTrigger.class;
+	}
+
+	@Override
+	public Class<? extends IContentProposalProvider> bindIContentProposalProvider() {
+		return UiToIdeContentProposalProvider.class;
+	}
+
+	public Class<? extends IdeContentProposalProvider> bindIdeContentProposalProvider() {
+		return GBSokobanIdeContentProposalProvider.class;
 	}
 }
