@@ -1,5 +1,6 @@
 package com.drodo.gbsokoban.validation;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.validation.ComposedChecks;
 
 import com.drodo.gbsokoban.gBSokoban.Deadly;
@@ -34,5 +35,9 @@ public class GBSokobanValidator extends AbstractGBSokobanValidator {
 			if (tile.getBehaviour() instanceof Deadly || tile.getBehaviour() instanceof Fillable)
 				return true;
 		return false;
+	}
+
+	static boolean hasUnresolvedReferences(Game game) {
+		return !EcoreUtil.UnresolvedProxyCrossReferencer.find(game).isEmpty();
 	}
 }

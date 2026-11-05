@@ -48,7 +48,7 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkSoundEventCanHappen(Sound sound) {
 		Game game = EcoreUtil2.getContainerOfType(sound, Game.class);
-		if (game == null || sound.getEvent() == null)
+		if (game == null || sound.getEvent() == null || GBSokobanValidator.hasUnresolvedReferences(game))
 			return;
 		String missing = null;
 		switch (sound.getEvent()) {

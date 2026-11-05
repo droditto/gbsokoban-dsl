@@ -17,11 +17,12 @@ public final class GoalTiles {
 	}
 
 	public static TileDef tileOf(WinCondition condition) {
+		TileDef tile = null;
 		if (condition instanceof AllOn)
-			return ((AllOn) condition).getTile();
-		if (condition instanceof SomeOn)
-			return ((SomeOn) condition).getTile();
-		return null;
+			tile = ((AllOn) condition).getTile();
+		else if (condition instanceof SomeOn)
+			tile = ((SomeOn) condition).getTile();
+		return tile == null || tile.eIsProxy() ? null : tile;
 	}
 
 	public static ObjectDef objectOf(WinCondition condition) {
@@ -30,7 +31,8 @@ public final class GoalTiles {
 			subject = ((AllOn) condition).getSubject();
 		else if (condition instanceof SomeOn)
 			subject = ((SomeOn) condition).getSubject();
-		return subject instanceof ObjectRef ? ((ObjectRef) subject).getObject() : null;
+		ObjectDef object = subject instanceof ObjectRef ? ((ObjectRef) subject).getObject() : null;
+		return object == null || object.eIsProxy() ? null : object;
 	}
 
 	public static Map<TileDef, ObjectDef> owners(Game game) {
@@ -39,7 +41,7 @@ public final class GoalTiles {
 			TileDef tile = tileOf(condition);
 			ObjectDef object = objectOf(condition);
 			if (tile != null && object != null)
-				owners.put(tile, object);
+				owners.putIfAbsent(tile, object);
 		}
 		return owners;
 	}

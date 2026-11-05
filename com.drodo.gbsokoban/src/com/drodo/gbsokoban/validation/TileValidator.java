@@ -43,7 +43,8 @@ public class TileValidator extends AbstractDeclarativeValidator {
 		if (object.getGoalTexture() == null)
 			return;
 		Game game = EcoreUtil2.getContainerOfType(object, Game.class);
-		if (game == null || GoalTiles.owners(game).containsValue(object))
+		if (game == null || GoalTiles.owners(game).containsValue(object)
+				|| GBSokobanValidator.hasUnresolvedReferences(game))
 			return;
 		warning("'" + object.getName() + "' has no goal to rest on, so this texture is never drawn. "
 				+ "Add a win condition, such as ALL " + object.getName() + " ON <tile>",

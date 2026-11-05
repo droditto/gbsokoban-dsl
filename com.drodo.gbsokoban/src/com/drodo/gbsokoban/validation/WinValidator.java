@@ -73,14 +73,14 @@ public class WinValidator extends AbstractDeclarativeValidator {
 			if (owner != null && owner != object)
 				error("'" + tile.getName() + "' already holds the goals of '" + owner.getName() + "'. Give '"
 						+ object.getName() + "' a tile of its own",
-						condition, subjectFeature(condition), INSIGNIFICANT_INDEX);
+						condition, tileFeature(condition), INSIGNIFICANT_INDEX);
 		}
 	}
 
-	private static EStructuralFeature subjectFeature(WinCondition condition) {
+	private static EStructuralFeature tileFeature(WinCondition condition) {
 		return condition instanceof AllOn
-				? GBSokobanPackage.Literals.ALL_ON__SUBJECT
-				: GBSokobanPackage.Literals.SOME_ON__SUBJECT;
+				? GBSokobanPackage.Literals.ALL_ON__TILE
+				: GBSokobanPackage.Literals.SOME_ON__TILE;
 	}
 
 	@Check

@@ -27,11 +27,11 @@ import com.drodo.gbsokoban.gBSokoban.ObjectRef;
 import com.drodo.gbsokoban.gBSokoban.PlayerRef;
 import com.drodo.gbsokoban.gBSokoban.Solid;
 import com.drodo.gbsokoban.gBSokoban.SomeOn;
-import com.drodo.gbsokoban.gBSokoban.Subject;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
 import com.drodo.gbsokoban.gBSokoban.WinCondition;
 import com.drodo.gbsokoban.model.Directions;
 import com.drodo.gbsokoban.model.GameTextures;
+import com.drodo.gbsokoban.model.GoalTiles;
 import com.drodo.gbsokoban.model.Levels;
 import com.drodo.gbsokoban.model.SymbolPool;
 import com.drodo.gbsokoban.util.CellGeometry;
@@ -215,7 +215,8 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkLevelIsPlayable(Level level) {
 		Game game = EcoreUtil2.getContainerOfType(level, Game.class);
-		if (game == null || game.getWin().isEmpty() || game.getTiles().isEmpty())
+		if (game == null || game.getWin().isEmpty() || game.getTiles().isEmpty()
+				|| GBSokobanValidator.hasUnresolvedReferences(game))
 			return;
 		LevelGrid grid = gridOf(game, level);
 		Set<TileDef> present = new HashSet<>();
@@ -235,22 +236,19 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkLevelHasEnoughObjects(Level level) {
 		Game game = EcoreUtil2.getContainerOfType(level, Game.class);
-		if (game == null || game.getTiles().isEmpty())
+		if (game == null || game.getTiles().isEmpty() || GBSokobanValidator.hasUnresolvedReferences(game))
 			return;
 		LevelGrid grid = gridOf(game, level);
+		Map<TileDef, ObjectDef> owners = GoalTiles.owners(game);
 		for (WinCondition condition : game.getWin()) {
-			boolean all = condition instanceof AllOn;
-			if (!all && !(condition instanceof SomeOn))
+			TileDef tile = GoalTiles.tileOf(condition);
+			ObjectDef object = GoalTiles.objectOf(condition);
+			if (tile == null || object == null || owners.get(tile) != object)
 				continue;
-			Subject subject = all ? ((AllOn) condition).getSubject() : ((SomeOn) condition).getSubject();
-			TileDef tile = all ? ((AllOn) condition).getTile() : ((SomeOn) condition).getTile();
-			if (!(subject instanceof ObjectRef) || tile == null)
-				continue;
-			ObjectDef object = ((ObjectRef) subject).getObject();
 			int goals = Collections.frequency(grid.tiles(), tile);
 			int placed = Collections.frequency(grid.objects(), object);
-			int needed = all ? goals : Math.min(goals, 1);
-			if (object != null && placed < needed)
+			int needed = condition instanceof AllOn ? goals : Math.min(goals, 1);
+			if (placed < needed)
 				warning("This level needs " + needed + " '" + object.getName() + "' on '" + tile.getName()
 						+ "' and has " + placed + ", so it can never be completed",
 						level, GBSokobanPackage.Literals.LEVEL__ROWS, 0);
