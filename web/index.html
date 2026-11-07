@@ -22,9 +22,17 @@
 	<dialog id="welcome">
 		<form method="dialog">
 			<h2>Eres el participante número <span class="participant"></span></h2>
-			<p>Completa las cuatro fases de la <a class="button" href="/docs/tarea.html" target="_blank" rel="noopener">Tarea</a> y, al terminar, rellena el <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLScQjjwggVqMfEQCX6clJkWnUozPpjn1ivpxVw8U4goH7fMeAQ/viewform" target="_blank" rel="noopener">Cuestionario</a>. Apunta tu número de participante, porque es lo primero que se te pedirá. No cierres esta pestaña hasta terminar o perderás tu número de participante y tu progreso.</p>
+			<p>Completa las cuatro fases de la <a class="button" href="/docs/tarea.html" target="gbsoko-tarea">Tarea</a> y, al terminar, rellena el <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLScQjjwggVqMfEQCX6clJkWnUozPpjn1ivpxVw8U4goH7fMeAQ/viewform" target="_blank" rel="noopener">Cuestionario</a>. Apunta tu número de participante, porque es lo primero que se te pedirá. No cierres esta pestaña hasta terminar o perderás tu número de participante y tu progreso.</p>
 			<div class="choices">
 				<button autofocus>Empezar</button>
+			</div>
+		</form>
+	</dialog>
+	<dialog id="lost">
+		<form method="dialog">
+			<h2>Se ha perdido la conexión</h2>
+			<div class="choices">
+				<button autofocus>Recargar</button>
 			</div>
 		</form>
 	</dialog>
@@ -32,14 +40,14 @@
 		<h1>GBSokoban DSL</h1>
 		<div class="actions study" hidden>
 			<span>Participante <span class="participant"></span></span>
-			<a class="button" href="/docs/tarea.html" target="_blank" rel="noopener">Tarea</a>
+			<a class="button" href="/docs/tarea.html" target="gbsoko-tarea">Tarea</a>
 			<a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLScQjjwggVqMfEQCX6clJkWnUozPpjn1ivpxVw8U4goH7fMeAQ/viewform" target="_blank" rel="noopener">Cuestionario</a>
 		</div>
 		<div class="actions">
 			<button id="play">Compilar</button>
 			<button id="download" disabled>Exportar</button>
 			<button id="share">Compartir</button>
-			<a class="button" href="/docs/" target="_blank" rel="noopener">Documentación</a>
+			<a class="button" href="/docs/" target="gbsoko-docs">Documentación</a>
 		</div>
 	</header>
 	<main>
@@ -55,7 +63,6 @@
 				Enter para empezar el juego y para abrir y cerrar el menú de pausa
 			</p>
 			<p id="status"></p>
-			<pre id="log"></pre>
 		</aside>
 	</main>
 	<script type="module" src="/src/main.js"></script>

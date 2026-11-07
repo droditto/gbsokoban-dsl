@@ -1,8 +1,8 @@
 import { EditorView, basicSetup } from 'codemirror';
 import { tooltips } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { Compartment, EditorState } from '@codemirror/state';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { languageServer } from '@marimo-team/codemirror-languageserver';
+import { LanguageServerClient, WebSocketTransport, languageServerWithClient } from '@marimo-team/codemirror-languageserver';
 
 import { gbsoko } from './gbsoko.js';
 import { previews } from './preview.js';
@@ -13,9 +13,9 @@ import './style.css';
 
 const consent = document.querySelector('#consent');
 const welcome = document.querySelector('#welcome');
+const lost = document.querySelector('#lost');
 const study = document.querySelectorAll('.study');
 const status = document.querySelector('#status');
-const log = document.querySelector('#log');
 const screen = document.querySelector('#screen');
 const playButton = document.querySelector('#play');
 const downloadButton = document.querySelector('#download');
@@ -26,6 +26,8 @@ const pullHint = document.querySelector('#pull');
 let rom = null;
 let romName;
 let joining = null;
+
+const UNREACHABLE = 'No se ha podido conectar al servidor. Recarga la página.';
 
 const opened = fetch('/api/session').then((response) => response.json());
 const post = (path, body) =>
@@ -41,12 +43,13 @@ function participate(number) {
 		const response = await post('/api/participate', { session: session.session, number });
 		const body = await response.json();
 		if (!response.ok) throw new Error(body.error);
+		window.addEventListener('beforeunload', confirmLeaving);
 		sessionStorage.setItem('participant', body.number);
 		for (const label of document.querySelectorAll('.participant')) label.textContent = body.number;
 		for (const element of study) element.hidden = false;
 		if (!number) welcome.showModal();
 	});
-	joining.catch((error) => say(String(error?.message ?? error), true));
+	joining.catch(() => say(UNREACHABLE, true));
 }
 
 function track(type, detail) {
@@ -60,13 +63,20 @@ async function start() {
 
 	const scheme = location.protocol === 'https:' ? 'wss' : 'ws';
 
-	const server = languageServer({
-		serverUri: `${scheme}://${location.host}/lsp?session=${session.session}`,
-		rootUri: session.rootUri,
-		documentUri: session.documentUri,
-		languageId: 'gbsoko',
-		workspaceFolders: [{ uri: session.rootUri, name: 'gbsokoban' }]
-	});
+	const server = new Compartment();
+	function connect() {
+		const transport = new WebSocketTransport(`${scheme}://${location.host}/lsp?session=${session.session}`);
+		const client = new LanguageServerClient({
+			rootUri: session.rootUri,
+			workspaceFolders: [{ uri: session.rootUri, name: 'gbsokoban' }],
+			transport
+		});
+		transport.onClose(() => {
+			if (client.ready) view.dispatch({ effects: server.reconfigure(connect()) });
+		});
+		client.initializePromise.catch(() => lost.showModal());
+		return languageServerWithClient({ client, documentUri: session.documentUri, languageId: 'gbsoko' });
+	}
 
 	const view = new EditorView({
 		state: EditorState.create({
@@ -77,7 +87,7 @@ async function start() {
 				oneDark,
 				gbsoko,
 				previews,
-				server,
+				server.of(connect()),
 				// On document.body, so tooltips on the first line are not clipped.
 				tooltips({ position: 'fixed', parent: document.body }),
 				EditorView.updateListener.of((update) => {
@@ -107,14 +117,12 @@ async function start() {
 		hint.hidden = true;
 		stop(screen);
 		say('Compilando');
-		log.textContent = '';
 		try {
 			const source = view.state.doc.toString();
 			const response = await post('/api/build', { session: session.session, source });
 			const body = await response.json();
 			if (!response.ok) {
 				say(body.error ?? 'No se ha podido compilar', true);
-				log.textContent = body.log ?? '';
 				return;
 			}
 			rom = Uint8Array.from(atob(body.bytes), (c) => c.charCodeAt(0));
@@ -124,8 +132,8 @@ async function start() {
 			pullHint.hidden = !/^\s*PLAYER_CAN_PULL\b/m.test(source);
 			downloadButton.disabled = false;
 			await play(screen, rom);
-		} catch (error) {
-			say(String(error?.message ?? error), true);
+		} catch {
+			say(UNREACHABLE, true);
 		} finally {
 			playButton.disabled = false;
 		}
@@ -154,6 +162,16 @@ async function start() {
 	});
 }
 
+function confirmLeaving(event) {
+	event.preventDefault();
+	event.returnValue = true;
+}
+
+lost.addEventListener('close', () => {
+	window.removeEventListener('beforeunload', confirmLeaving);
+	location.reload();
+});
+
 consent.addEventListener('close', () => {
 	if (consent.returnValue !== 'yes' && consent.returnValue !== 'no') return consent.showModal();
 	sessionStorage.setItem('consent', consent.returnValue);
@@ -162,4 +180,4 @@ consent.addEventListener('close', () => {
 if (!sessionStorage.getItem('consent')) consent.showModal();
 else if (sessionStorage.getItem('consent') === 'yes') participate(Number(sessionStorage.getItem('participant')));
 
-start().catch((error) => say(String(error?.message ?? error), true));
+start().catch(() => say(UNREACHABLE, true));

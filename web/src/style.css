@@ -12,13 +12,11 @@
 	--background: hsl(200, 7%, 8%);
 	--border: hsl(200, 7%, 13%);
 	--text: #a1adb8;
-	--muted: #666;
-	--accent: #3473ad;
+	--accent: #61afef;
 	--dim: #43484d;
 	--warning: #f48771;
 
 	--font: 14px/1.5 InterVariable, system-ui, sans-serif;
-	--code: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
 
 	--tight: 4px;
 	--gap: 8px;
@@ -61,15 +59,6 @@ h1 {
 aside p { margin: 0; }
 
 #status.warning { color: var(--warning); }
-
-#log {
-	flex: 1;
-	margin: 0;
-	overflow: auto;
-	white-space: pre-wrap;
-	font: var(--code);
-	color: var(--muted);
-}
 
 button,
 .button {
@@ -205,3 +194,12 @@ body.resizing main * { pointer-events: none; }
 }
 
 .cm-row span { width: var(--row); }
+
+.cm-tooltip .cm-diagnostic .cm-diagnosticAction {
+	display: block;
+	margin: var(--tight) 0 0;
+	padding: 0;
+	background: none;
+}
+
+.cm-tooltip .cm-diagnostic .cm-diagnosticSource { display: none; }

@@ -20,6 +20,7 @@ const MAX_SOURCE_BYTES = 256 * 1024;
 const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
 const DATA = join(HERE, 'data');
 const EVENTS = new Set(['assist', 'completion', 'fix']);
+const BUILD_FAILED = 'No se ha podido compilar. Inténtalo de nuevo.';
 
 if (!existsSync(LIB)) {
 	console.error('Falta build/lib. Ejecuta primero ./setup.sh');
@@ -82,7 +83,7 @@ const server = createServer(async (request, response) => {
 			session.participant = resumed ? body.number : nextParticipant();
 			record(session, { type: resumed ? 'resume' : 'start' });
 			// The documentation is plain pages: the cookie tells whose visit each one is.
-			response.setHeader('set-cookie', `participant=${session.participant}; Path=/; HttpOnly; SameSite=Strict`);
+			response.setHeader('set-cookie', `session=${session.id}; Path=/; HttpOnly; SameSite=Strict`);
 			return json(response, 200, { number: session.participant });
 		}
 
@@ -95,16 +96,16 @@ const server = createServer(async (request, response) => {
 		}
 
 		if (SERVE_DIST) {
-			const participant = Number(/(?:^|;\s*)participant=(\d+)/.exec(request.headers.cookie ?? '')?.[1]);
-			if (participant && /^\/docs\/(\w+\.html)?$/.test(url.pathname))
-				record({ participant }, { type: 'docs', detail: url.pathname.slice(6) || 'index.html' });
+			const visitor = sessions.get(/(?:^|;\s*)session=([\w-]+)/.exec(request.headers.cookie ?? '')?.[1]);
+			if (visitor && /^\/docs\/(\w+\.html)?$/.test(url.pathname))
+				record(visitor, { type: 'docs', detail: url.pathname.slice(6) || 'index.html' });
 			return serveStatic(url.pathname, request, response);
 		}
 
 		response.writeHead(404).end();
 	} catch (error) {
 		console.error(error);
-		json(response, 500, { error: String(error?.message ?? error) });
+		json(response, 500, { error: BUILD_FAILED });
 	}
 });
 
@@ -175,7 +176,8 @@ async function build(request, response) {
 		}
 		if (generated.code !== 0) {
 			recordBuild('failed');
-			return json(response, 500, { error: 'Error interno al generar el proyecto.', log: tail(generated.stderr) });
+			console.error(generated.stderr);
+			return json(response, 500, { error: BUILD_FAILED });
 		}
 
 		const project = (await readdir(out)).find((name) => existsSync(join(out, name, 'Makefile')));
@@ -185,11 +187,12 @@ async function build(request, response) {
 		if (made.code !== 0 && /can be reached/.test(made.stdout)) {
 			recordBuild('too-big');
 			const error = 'Tu juego es demasiado grande. Quita niveles, hazlos más pequeños o usa menos texturas.';
-			return json(response, 422, { error, log: tail(made.stdout) });
+			return json(response, 422, { error });
 		}
 		if (made.code !== 0) {
 			recordBuild('failed');
-			return json(response, 500, { error: 'No se ha podido generar la ROM.', log: tail(made.stdout + made.stderr) });
+			console.error(made.stdout + made.stderr);
+			return json(response, 500, { error: BUILD_FAILED });
 		}
 
 		const name = (await readdir(dir)).find((file) => file.endsWith('.gb') || file.endsWith('.gbc'));
@@ -243,8 +246,6 @@ function run(command, args, cwd) {
 	});
 }
 
-const tail = (text) => text.split('\n').slice(-25).join('\n');
-
 const websockets = new WebSocketServer({ server, path: '/lsp' });
 
 websockets.on('connection', (socket, request) => {
@@ -252,6 +253,8 @@ websockets.on('connection', (socket, request) => {
 	const session = sessions.get(id);
 	if (!session) return socket.close(4004, 'sesión desconocida');
 	session.seen = Date.now();
+	socket.isAlive = true;
+	socket.on('pong', () => (socket.isAlive = true));
 
 	const language = spawn('java', ['-cp', classpath, 'org.eclipse.xtext.ide.server.ServerLauncher'], {
 		cwd: session.dir
@@ -299,6 +302,17 @@ function recordDiagnostics(session, diagnostics) {
 	session.diagnostics = summary;
 	record(session, { type: 'diagnostics', errors, warnings });
 }
+
+setInterval(() => {
+	for (const socket of websockets.clients) {
+		if (!socket.isAlive) {
+			socket.terminate();
+			continue;
+		}
+		socket.isAlive = false;
+		socket.ping();
+	}
+}, 30_000).unref();
 
 setInterval(() => {
 	const limit = Date.now() - SESSION_TTL_MS;
