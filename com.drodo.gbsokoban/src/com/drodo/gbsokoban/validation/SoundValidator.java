@@ -17,6 +17,7 @@ import com.drodo.gbsokoban.gBSokoban.SoundChannel;
 import com.drodo.gbsokoban.gBSokoban.SoundEvent;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
 import com.drodo.gbsokoban.model.GoalTiles;
+import com.drodo.gbsokoban.util.Messages;
 
 public class SoundValidator extends AbstractDeclarativeValidator {
 
@@ -41,7 +42,7 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 		Set<SoundEvent> declared = EnumSet.noneOf(SoundEvent.class);
 		for (Sound sound : game.getSounds())
 			if (sound.getEvent() != null && !declared.add(sound.getEvent()))
-				error("'" + sound.getEvent().getLiteral() + "' already has a sound",
+				error(Messages.get("sound.duplicate"),
 						sound, GBSokobanPackage.Literals.SOUND__EVENT, INSIGNIFICANT_INDEX);
 	}
 
@@ -53,24 +54,23 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 		String missing = null;
 		switch (sound.getEvent()) {
 			case PUSH:
-				if (game.getObjects().isEmpty()) missing = "no objects to push";
+				if (game.getObjects().isEmpty()) missing = "sound.noPush";
 				break;
 			case ON_GOAL:
-				if (GoalTiles.owners(game).isEmpty()) missing = "no goals for an object to reach";
+				if (GoalTiles.owners(game).isEmpty()) missing = "sound.noGoal";
 				break;
 			case DESTROY:
 				if (game.getObjects().isEmpty() || !GBSokobanValidator.destroysObjects(game))
-					missing = "nothing that destroys objects";
+					missing = "sound.noDestroy";
 				break;
 			case COLLAPSE:
-				if (!collapses(game)) missing = "no tile that collapses";
+				if (!collapses(game)) missing = "sound.noCollapse";
 				break;
 			default:
 				break;
 		}
 		if (missing != null)
-			warning("This game has " + missing + ", so '" + sound.getEvent().getLiteral()
-					+ "' never plays", GBSokobanPackage.Literals.SOUND__EVENT,
+			warning(Messages.get(missing), GBSokobanPackage.Literals.SOUND__EVENT,
 					GBSokobanValidator.ISSUE_SOUND_NEVER_PLAYS);
 	}
 
@@ -93,7 +93,7 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 
 	private void checkRegisterFitsByte(Sound sound, int value, EStructuralFeature feature) {
 		if (value > MAX_REGISTER_VALUE)
-			error("Each sound value must be between 0 and " + MAX_REGISTER_VALUE, sound, feature, -1);
+			error(Messages.get("value.range", 0, MAX_REGISTER_VALUE), sound, feature, -1);
 	}
 
 	/** Only pulse 1 and the wave channel have an NRx0: the sweep and the DAC switch. */
@@ -101,7 +101,7 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 	public void checkFirstRegisterIsUsed(Sound sound) {
 		SoundChannel channel = sound.getChannel();
 		if ((channel == SoundChannel.NR2 || channel == SoundChannel.NR4) && sound.getR0() != 0)
-			warning("Channel " + channel.getLiteral() + " ignores the first value. Use 0",
+			warning(Messages.get("sound.firstIgnored"),
 					sound, GBSokobanPackage.Literals.SOUND__R0, -1);
 	}
 
@@ -116,14 +116,14 @@ public class SoundValidator extends AbstractDeclarativeValidator {
 			return;
 		boolean silent = sound.getR2() < MIN_AUDIBLE_VOLUME && (sound.getR2() & ENVELOPE_CLIMBS) == 0;
 		if (silent)
-			warning("This sound is silent. Raise the third value to " + MIN_AUDIBLE_VOLUME + " or more",
+			warning(Messages.get("sound.silent", MIN_AUDIBLE_VOLUME),
 					sound, GBSokobanPackage.Literals.SOUND__R2, -1);
 	}
 
 	@Check
 	public void checkWaveChannelIsAudible(Sound sound) {
 		if (sound.getChannel() == SoundChannel.NR3 && (sound.getR0() & WAVE_DAC_ON) == 0)
-			warning("Channel NR3 is silent unless its first value is " + WAVE_DAC_ON + " or more",
+			warning(Messages.get("sound.silent", WAVE_DAC_ON),
 					sound, GBSokobanPackage.Literals.SOUND__R0, -1);
 	}
 }

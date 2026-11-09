@@ -16,6 +16,7 @@ import com.drodo.gbsokoban.gBSokoban.Game;
 import com.drodo.gbsokoban.gBSokoban.Player;
 import com.drodo.gbsokoban.model.AnimationChain;
 import com.drodo.gbsokoban.model.Directions;
+import com.drodo.gbsokoban.util.Messages;
 import com.drodo.gbsokoban.util.Speeds;
 
 public class PlayerValidator extends AbstractDeclarativeValidator {
@@ -30,13 +31,13 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 		for (Animation anim : player.getAnims())
 			if (anim.getKind() == AnimKind.WALK)
 				return;
-		error("The player needs a WALK animation", player, GBSokobanPackage.Literals.PLAYER__ANIMS, -1);
+		error(Messages.get("player.noWalk"), player, GBSokobanPackage.Literals.PLAYER__ANIMS, -1);
 	}
 
 	@Check
 	public void checkPullHasObjects(Game game) {
 		if (game.isCanPull() && game.getObjects().isEmpty())
-			warning("This game has no objects to pull. Remove PLAYER_CAN_PULL or add an OBJECTS section",
+			warning(Messages.get("player.pullWithoutObjects"),
 					GBSokobanPackage.Literals.GAME__CAN_PULL, GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS);
 	}
 
@@ -47,7 +48,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 			return;
 		for (Animation anim : player.getAnims())
 			if (anim.getKind() == AnimKind.PULL) {
-				error("A PULL animation needs PLAYER_CAN_PULL",
+				error(Messages.get("player.pullNeedsCanPull"),
 						anim, GBSokobanPackage.Literals.ANIMATION__KIND, -1, GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL);
 				return;
 			}
@@ -66,8 +67,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 			for (Direction direction : Direction.values()) {
 				if (AnimationChain.follow(player, kind, direction).source() != null)
 					continue;
-				String message = kind.getLiteral() + " " + direction.getLiteral() + " has no frames. "
-						+ "List textures for it or MIRROR the opposite direction";
+				String message = Messages.get("player.noFrames", kind.getLiteral() + " " + direction.getLiteral());
 				Animation anim = declarationOf(player, kind, direction);
 				if (anim == null)
 					error(message, player, GBSokobanPackage.Literals.PLAYER__ANIMS, -1);
@@ -90,8 +90,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 		Direction source = anim.getMirror().getSource();
 		Direction wanted = Directions.opposite(anim.getDirection());
 		if (source != wanted)
-			error(anim.getDirection().getLiteral() + " can only mirror " + wanted.getLiteral()
-					+ ", its opposite",
+			error(Messages.get("player.mirrorOpposite", wanted.getLiteral()),
 					anim, GBSokobanPackage.Literals.ANIMATION__MIRROR, -1);
 	}
 
@@ -102,8 +101,8 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 				continue;
 			int count = anim.getFrames().getTextures().size();
 			if (count > Speeds.MAX_ANIM_FRAMES)
-				error("An animation can have at most " + Speeds.MAX_ANIM_FRAMES + " frames. This one has "
-						+ count, anim, GBSokobanPackage.Literals.ANIMATION__FRAMES, -1);
+				error(Messages.get("player.tooManyFrames", Speeds.MAX_ANIM_FRAMES),
+						anim, GBSokobanPackage.Literals.ANIMATION__FRAMES, -1);
 		}
 	}
 
@@ -118,7 +117,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 			if (expected == -1)
 				expected = count;
 			else if (count != expected)
-				error("Every animation needs the same number of frames. This game uses " + expected,
+				error(Messages.get("player.framesMismatch", expected),
 						anim, GBSokobanPackage.Literals.ANIMATION__FRAMES, -1);
 		}
 	}

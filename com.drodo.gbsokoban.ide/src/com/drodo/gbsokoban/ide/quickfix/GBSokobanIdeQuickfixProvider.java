@@ -20,6 +20,8 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import com.drodo.gbsokoban.gBSokoban.Level;
 import com.drodo.gbsokoban.gBSokoban.PaletteDef;
 import com.drodo.gbsokoban.gBSokoban.Texture;
+import com.drodo.gbsokoban.util.Messages;
+import com.drodo.gbsokoban.util.Palettes;
 import com.drodo.gbsokoban.validation.GBSokobanValidator;
 import com.drodo.gbsokoban.validation.QuickFixes;
 
@@ -28,19 +30,19 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL)
 	public void replaceDuplicateSymbol(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Use a free character", (ITextModification) (diagnostic, object, document) ->
+		acceptor.accept(Messages.get("fix.freeSymbol"), (ITextModification) (diagnostic, object, document) ->
 				one(diagnostic.getRange(), QuickFixes.freeSymbol(object)));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_SYMBOL_LENGTH)
 	public void trimSymbol(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Keep only the first character", (ITextModification) (diagnostic, object, document) ->
+		acceptor.accept(Messages.get("fix.firstCharacter"), (ITextModification) (diagnostic, object, document) ->
 				one(diagnostic.getRange(), QuickFixes.firstCharacter(document.getSubstring(diagnostic.getRange()))));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL)
 	public void allowPulling(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Add PLAYER_CAN_PULL", (ITextModification) (diagnostic, object, document) -> {
+		acceptor.accept(Messages.get("fix.addCanPull"), (ITextModification) (diagnostic, object, document) -> {
 			Position start = new Position(0, 0);
 			return one(new Range(start, start), QuickFixes.CAN_PULL_LINE);
 		});
@@ -48,7 +50,7 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
 	public void addPlayerToLegend(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Add a character for the player", (ITextModification) (diagnostic, object, document) -> {
+		acceptor.accept(Messages.get("fix.addPlayer"), (ITextModification) (diagnostic, object, document) -> {
 			Position start = diagnostic.getRange().getStart();
 			return one(new Range(start, start), QuickFixes.playerLegendLine(object));
 		});
@@ -56,30 +58,30 @@ public class GBSokobanIdeQuickfixProvider extends AbstractDeclarativeIdeQuickfix
 
 	@QuickFix(GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS)
 	public void keepFirstPlayer(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Keep only the first player", rewrite(Level.class, QuickFixes::keepFirstPlayer));
+		acceptor.accept(Messages.get("fix.keepFirstPlayer"), rewrite(Level.class, QuickFixes::keepFirstPlayer));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_TEXTURE_SIZE)
 	public void fitTextureToSize(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Resize the texture", rewrite(Texture.class, QuickFixes::fitTexture));
+		acceptor.accept(Messages.get("fix.resizeTexture"), rewrite(Texture.class, QuickFixes::fitTexture));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_PALETTE_SIZE)
 	public void fitPaletteToRegister(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Resize the palette to 4 colors",
+		acceptor.accept(Messages.get("fix.resizePalette", Palettes.ENTRIES),
 				rewrite(PaletteDef.class, (host, text) -> QuickFixes.fitPalette(text)));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS)
 	public void stopPulling(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Remove PLAYER_CAN_PULL",
+		acceptor.accept(Messages.get("fix.removeCanPull"),
 				(ITextModification) (diagnostic, object, document) -> deleteLine(document,
 						diagnostic.getRange().getStart().getLine()));
 	}
 
 	@QuickFix(GBSokobanValidator.ISSUE_SOUND_NEVER_PLAYS)
 	public void removeUnreachableSound(DiagnosticResolutionAcceptor acceptor) {
-		acceptor.accept("Remove the sound",
+		acceptor.accept(Messages.get("fix.removeSound"),
 				(ITextModification) (diagnostic, object, document) -> deleteLine(document,
 						diagnostic.getRange().getStart().getLine()));
 	}

@@ -23,6 +23,7 @@ import com.drodo.gbsokoban.gBSokoban.Texture;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
 import com.drodo.gbsokoban.model.GameTextures;
 import com.drodo.gbsokoban.util.CSymbols;
+import com.drodo.gbsokoban.util.Messages;
 import com.drodo.gbsokoban.util.ScreenText;
 import com.drodo.gbsokoban.util.Speeds;
 import com.drodo.gbsokoban.util.TileKind;
@@ -54,32 +55,28 @@ public class GameValidator extends AbstractDeclarativeValidator {
 
 		int title = ScreenText.titleRows(game.getTitle(), game.getAuthor()).size();
 		if (title > ScreenText.TITLE_ROWS)
-			error("The title screen needs " + title + " rows and only " + ScreenText.TITLE_ROWS
-					+ " fit above PUSH START. Shorten the title or the author",
+			error(Messages.get("game.titleRows"),
 					ScreenText.titleRows(game.getTitle(), null).size() >= ScreenText.titleRows(null, game.getAuthor()).size()
 							? GBSokobanPackage.Literals.GAME__TITLE
 							: GBSokobanPackage.Literals.GAME__AUTHOR);
 		int ending = ScreenText.wrap(game.getEnding()).size();
 		if (ending > ScreenText.ROWS)
-			error("The ending needs " + ending + " rows and only " + ScreenText.ROWS + " fit on the screen",
+			error(Messages.get("game.endingRows"),
 					GBSokobanPackage.Literals.GAME__ENDING);
 	}
 
 	private void reportScreenText(String text, EStructuralFeature feature) {
 		if (ScreenText.losesCharacters(text))
-			warning((ScreenText.printable(text).isEmpty() ? "None of this will show"
-					: "This will show as '" + ScreenText.printable(text) + "'")
-					+ ". The font has only A-Z, 0-9 and spaces", feature);
+			warning(Messages.get("game.textShownAs", ScreenText.printable(text)), feature);
 		for (String row : ScreenText.wrap(text))
 			if (row.length() > ScreenText.COLUMNS)
-				error("'" + row + "' is " + row.length() + " characters long and only "
-						+ ScreenText.COLUMNS + " fit on a row", feature);
+				error(Messages.get("game.wordTooLong", row, ScreenText.COLUMNS), feature);
 	}
 
 	@Check
 	public void checkLevelCountWithinEngineLimit(Game game) {
 		if (game.getLevels().size() > MAX_LEVELS)
-			error("A game can have at most " + MAX_LEVELS + " levels. This one has " + game.getLevels().size(),
+			error(Messages.get("game.tooManyLevels", MAX_LEVELS),
 					game.getLevels().get(MAX_LEVELS), GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 	}
 
@@ -88,11 +85,11 @@ public class GameValidator extends AbstractDeclarativeValidator {
 		int fastest = Speeds.maxMoveSpeed(GameTextures.cellPx(game));
 		if (wasWritten(game, GBSokobanPackage.Literals.GAME__MOVE_SPEED)
 				&& (game.getMoveSpeed() < 1 || game.getMoveSpeed() > fastest))
-			error("MOVE_SPEED must be between 1 and " + fastest,
+			error(Messages.get("value.range", 1, fastest),
 					GBSokobanPackage.Literals.GAME__MOVE_SPEED);
 		if (wasWritten(game, GBSokobanPackage.Literals.GAME__ANIM_SPEED)
 				&& (game.getAnimSpeed() < 1 || game.getAnimSpeed() > Speeds.MAX_ANIM_SPEED))
-			error("ANIM_SPEED must be between 1 and " + Speeds.MAX_ANIM_SPEED,
+			error(Messages.get("value.range", 1, Speeds.MAX_ANIM_SPEED),
 					GBSokobanPackage.Literals.GAME__ANIM_SPEED);
 	}
 
@@ -116,7 +113,7 @@ public class GameValidator extends AbstractDeclarativeValidator {
 
 	private void reportDuplicateName(EObject host, String name, Set<String> used, EStructuralFeature feature) {
 		if (name != null && !used.add(name.toLowerCase(Locale.ROOT)))
-			error("The name '" + name + "' is already used. Names ignore capitals",
+			error(Messages.get("game.nameTaken"),
 					host, feature, -1);
 	}
 
@@ -142,45 +139,37 @@ public class GameValidator extends AbstractDeclarativeValidator {
 			owner.put(reserved, ENGINE);
 
 		for (TileDef tile : game.getTiles()) {
-			claimSymbol(tile, CSymbols.tile(tile.getName()), "'" + tile.getName() + "'", owner);
-			claimSymbol(tile, CSymbols.cell(tile.getName()), "'" + tile.getName() + "'", owner);
+			claimSymbol(tile, CSymbols.tile(tile.getName()), tile.getName(), owner);
+			claimSymbol(tile, CSymbols.cell(tile.getName()), tile.getName(), owner);
 		}
 		for (ObjectDef object : game.getObjects()) {
-			claimSymbol(object, CSymbols.cell(object.getName()), "'" + object.getName() + "'", owner);
+			claimSymbol(object, CSymbols.cell(object.getName()), object.getName(), owner);
 			if (object.getGoalTexture() != null)
-				claimSymbol(object, CSymbols.onGoalCell(object.getName()),
-						"the ON_GOAL texture of '" + object.getName() + "'", owner);
+				claimSymbol(object, CSymbols.onGoalCell(object.getName()), object.getName() + " ON_GOAL", owner);
 		}
 	}
 
 	private void claimSymbol(EObject host, String symbol, String who, Map<String, String> owner) {
 		String previous = owner.putIfAbsent(symbol, who);
-		if (previous == null || previous.equals(who))
+		if (previous == null || previous.equalsIgnoreCase(who))
 			return;
 		error(previous.equals(ENGINE)
-				? "The game already uses this name internally. Use another one"
-				: "This ends up with the same name as " + previous + ". Rename one of them",
+				? Messages.get("game.nameInternal")
+				: Messages.get("game.nameClash", previous),
 				host, GBSokobanPackage.Literals.ENTITY__NAME, -1);
 	}
 
 	@Check
 	public void checkUniqueSymbols(Game game) {
-		Map<String, String> owner = new HashMap<>();
+		Set<String> used = new HashSet<>();
 		for (TileDef tile : game.getTiles())
-			reportDuplicateSymbol(tile, tile.getSymbol(), "'" + tile.getName() + "'",
-					GBSokobanPackage.Literals.TILE_DEF__SYMBOL, owner);
+			reportDuplicateSymbol(tile, tile.getSymbol(), GBSokobanPackage.Literals.TILE_DEF__SYMBOL, used);
 		for (LegendEntry entry : game.getLegend())
-			reportDuplicateSymbol(entry, entry.getSymbol(), "a legend entry",
-					GBSokobanPackage.Literals.LEGEND_ENTRY__SYMBOL, owner);
+			reportDuplicateSymbol(entry, entry.getSymbol(), GBSokobanPackage.Literals.LEGEND_ENTRY__SYMBOL, used);
 	}
 
-	private void reportDuplicateSymbol(EObject host, String symbol, String who,
-			EStructuralFeature feature, Map<String, String> owner) {
-		if (symbol == null)
-			return;
-		String previous = owner.put(symbol, who);
-		if (previous != null)
-			error("'" + symbol + "' is already used by " + previous + ". Use another character",
-					host, feature, -1, GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL);
+	private void reportDuplicateSymbol(EObject host, String symbol, EStructuralFeature feature, Set<String> used) {
+		if (symbol != null && !used.add(symbol))
+			error(Messages.get("game.symbolTaken"), host, feature, -1, GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL);
 	}
 }

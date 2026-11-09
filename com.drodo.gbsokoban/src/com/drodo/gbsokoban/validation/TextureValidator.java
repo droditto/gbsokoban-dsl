@@ -12,6 +12,7 @@ import com.drodo.gbsokoban.gBSokoban.Texture;
 import com.drodo.gbsokoban.generator.analysis.TilesetAllocator;
 import com.drodo.gbsokoban.model.GameTextures;
 import com.drodo.gbsokoban.util.CellGeometry;
+import com.drodo.gbsokoban.util.Messages;
 import com.drodo.gbsokoban.util.Palettes;
 import com.drodo.gbsokoban.util.VramLayout;
 
@@ -28,23 +29,21 @@ public class TextureValidator extends AbstractDeclarativeValidator {
 		if (rows == 0)
 			return;
 		if (!CellGeometry.SUPPORTED_PX.contains(rows)) {
-			error("A texture must be " + CellGeometry.supportedPxAsText() + " rows tall. This one has " + rows,
+			error(Messages.get("texture.rows", CellGeometry.SUPPORTED_PX.get(0), CellGeometry.SUPPORTED_PX.get(1)),
 					GBSokobanPackage.Literals.TEXTURE__NAME, GBSokobanValidator.ISSUE_TEXTURE_SIZE);
 			return;
 		}
 		for (int i = 0; i < rows; i++) {
 			String row = texture.getRows().get(i);
 			if (row.length() != rows) {
-				error("This row is " + row.length() + " characters wide. A texture must be square, so it "
-						+ "needs " + rows, texture,
+				error(Messages.get("texture.notSquare", rows), texture,
 						GBSokobanPackage.Literals.TEXTURE__ROWS, i, GBSokobanValidator.ISSUE_TEXTURE_SIZE);
 				return;
 			}
 			for (int x = 0; x < row.length(); x++) {
 				char c = row.charAt(x);
 				if (c != '.' && (c < '0' || c - '0' >= Palettes.ENTRIES)) {
-					error("'" + c + "' is not a color of the palette. Use 0 to " + (Palettes.ENTRIES - 1)
-							+ ", or . for 0",
+					error(Messages.get("texture.badColor", Palettes.ENTRIES - 1),
 							texture, GBSokobanPackage.Literals.TEXTURE__ROWS, i);
 					return;
 				}
@@ -57,17 +56,10 @@ public class TextureValidator extends AbstractDeclarativeValidator {
 		int expected = GameTextures.cellPx(game);
 		if (expected == 0)
 			return;
-		String sizedBy = null;
-		for (Texture texture : game.getTextures())
-			if (!texture.getRows().isEmpty()) {
-				sizedBy = texture.getName();
-				break;
-			}
 		for (Texture texture : game.getTextures()) {
 			int size = texture.getRows().size();
 			if (size != expected && (size == 8 || size == 16))
-				error("Every texture must be the same size. This one is " + size + "x" + size
-						+ " but '" + sizedBy + "' is " + expected + "x" + expected, texture,
+				error(Messages.get("texture.sameSize", expected), texture,
 						GBSokobanPackage.Literals.TEXTURE__NAME, -1, GBSokobanValidator.ISSUE_TEXTURE_SIZE);
 		}
 	}
@@ -82,17 +74,13 @@ public class TextureValidator extends AbstractDeclarativeValidator {
 		int bkgTiles = TilesetAllocator.allocateBackground(bkg, cellPx).tiles().size();
 		if (bkgTiles > VramLayout.BKG_TILE_BUDGET)
 			reportWhereRoomRunsOut(bkg, cellPx, VramLayout.BKG_TILE_BUDGET, false,
-					"The tiles and objects take " + bkgTiles + " slots of video memory and "
-							+ "only " + VramLayout.BKG_TILE_BUDGET + " fit. Reuse textures "
-							+ "between them. The memory runs out here");
+					Messages.get("texture.bkgMemory"));
 
 		List<Texture> sprites = GameTextures.sprites(game);
 		int spriteTiles = TilesetAllocator.allocateSprites(sprites, cellPx).tiles().size();
 		if (spriteTiles > VramLayout.SPRITE_TILES)
 			reportWhereRoomRunsOut(sprites, cellPx, VramLayout.SPRITE_TILES, true,
-					"The player and the moving objects take " + spriteTiles + " slots of video "
-							+ "memory and only " + VramLayout.SPRITE_TILES + " fit. Use fewer frames or "
-							+ "MIRROR. The memory runs out here");
+					Messages.get("texture.spriteMemory"));
 	}
 
 	private void reportWhereRoomRunsOut(List<Texture> textures, int cellPx, int budget,

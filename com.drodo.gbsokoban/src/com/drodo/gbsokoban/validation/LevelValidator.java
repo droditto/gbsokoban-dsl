@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
@@ -35,6 +37,7 @@ import com.drodo.gbsokoban.model.GoalTiles;
 import com.drodo.gbsokoban.model.Levels;
 import com.drodo.gbsokoban.model.SymbolPool;
 import com.drodo.gbsokoban.util.CellGeometry;
+import com.drodo.gbsokoban.util.Messages;
 import com.drodo.gbsokoban.util.VramLayout;
 
 public class LevelValidator extends AbstractDeclarativeValidator {
@@ -55,12 +58,10 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 		int height = level.getRows().size();
 		int width = Levels.width(level);
 		if (width > maxCells)
-			error("This level is " + width + " cells wide. At " + cellPx + "x" + cellPx
-					+ " the most that fits is " + maxCells,
+			error(Messages.get("level.tooWide", maxCells),
 					level, GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 		if (height > maxCells)
-			error("This level is " + height + " cells tall. At " + cellPx + "x" + cellPx
-					+ " the most that fits is " + maxCells,
+			error(Messages.get("level.tooTall", maxCells),
 					level, GBSokobanPackage.Literals.LEVEL__ROWS, height - 1);
 	}
 
@@ -90,10 +91,10 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 		}
 
 		if (count == 0)
-			error("This level has no player. It needs exactly one", level,
+			error(Messages.get("level.noPlayer"), level,
 					GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 		else if (count > 1)
-			error("This level has " + count + " players. It needs exactly one", level,
+			error(Messages.get("level.manyPlayers"), level,
 					GBSokobanPackage.Literals.LEVEL__ROWS, extraRow, GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS);
 	}
 
@@ -110,7 +111,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 			for (int x = 0; x < row.length(); x++) {
 				String symbol = String.valueOf(row.charAt(x));
 				if (!known.contains(symbol) && reported.add(symbol))
-					error("'" + symbol + "' is not declared. Add a tile or a legend entry for it",
+					error(Messages.get("level.undeclared", symbol),
 							level, GBSokobanPackage.Literals.LEVEL__ROWS, y);
 			}
 		}
@@ -198,9 +199,14 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 				cell = carriesTo[cell];
 			}
 			if (cell >= 0 && visited[cell] == 1) {
-				error("The conveyor at (" + cell % grid.width() + "," + cell / grid.width()
-						+ ") carries the player round in a loop, so the level can never be left",
-						level, GBSokobanPackage.Literals.LEVEL__ROWS, cell / grid.width());
+				List<INode> rows = NodeModelUtils.findNodesForFeature(level, GBSokobanPackage.Literals.LEVEL__ROWS);
+				String message = Messages.get("level.conveyorLoop");
+				int loop = cell;
+				do {
+					int offset = rows.get(loop / grid.width()).getOffset() + 1 + loop % grid.width();
+					getMessageAcceptor().acceptError(message, level, offset, 1, null);
+					loop = carriesTo[loop];
+				} while (loop != cell);
 				return;
 			}
 			for (int seen : walked)
@@ -229,7 +235,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 			if (vacuous == null || !vacuous)
 				return;
 		}
-		warning("No win condition applies here, so the level clears on the first move",
+		warning(Messages.get("level.noWinApplies"),
 				level, GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 	}
 
@@ -249,8 +255,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 			int placed = Collections.frequency(grid.objects(), object);
 			int needed = condition instanceof AllOn ? goals : Math.min(goals, 1);
 			if (placed < needed)
-				warning("This level needs " + needed + " '" + object.getName() + "' on '" + tile.getName()
-						+ "' and has " + placed + ", so it can never be completed",
+				warning(Messages.get("level.notEnough", object.getName(), tile.getName()),
 						level, GBSokobanPackage.Literals.LEVEL__ROWS, 0);
 		}
 	}

@@ -19,6 +19,8 @@ import org.eclipse.xtext.validation.Issue;
 import com.drodo.gbsokoban.gBSokoban.Level;
 import com.drodo.gbsokoban.gBSokoban.PaletteDef;
 import com.drodo.gbsokoban.gBSokoban.Texture;
+import com.drodo.gbsokoban.util.Messages;
+import com.drodo.gbsokoban.util.Palettes;
 import com.drodo.gbsokoban.validation.GBSokobanValidator;
 import com.drodo.gbsokoban.validation.QuickFixes;
 
@@ -26,13 +28,13 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_DUPLICATE_SYMBOL)
 	public void replaceDuplicateSymbol(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Use a free character", "Replaces it with a character nothing else uses.", null,
+		acceptor.accept(issue, Messages.get("fix.freeSymbol"), null, null,
 				(IModification) context -> replaceAt(issue, context, issue.getLength(), QuickFixes::freeSymbol));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_SYMBOL_LENGTH)
 	public void trimSymbol(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Keep only the first character", "Deletes everything after the first character.", null,
+		acceptor.accept(issue, Messages.get("fix.firstCharacter"), null, null,
 				(IModification) context -> {
 					IXtextDocument doc = context.getXtextDocument();
 					String fixed = QuickFixes.firstCharacter(doc.get(issue.getOffset(), issue.getLength()));
@@ -43,39 +45,38 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_PULL_REQUIRES_CAN_PULL)
 	public void allowPulling(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Add PLAYER_CAN_PULL", "Adds PLAYER_CAN_PULL to the game options.", null,
+		acceptor.accept(issue, Messages.get("fix.addCanPull"), null, null,
 				(IModification) context -> context.getXtextDocument().replace(0, 0, QuickFixes.CAN_PULL_LINE));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_LEGEND_NO_PLAYER)
 	public void addPlayerToLegend(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Add a character for the player", "Adds a legend entry that puts the player on a plain tile.",
-				null, (IModification) context -> replaceAt(issue, context, 0, QuickFixes::playerLegendLine));
+		acceptor.accept(issue, Messages.get("fix.addPlayer"), null, null,
+				(IModification) context -> replaceAt(issue, context, 0, QuickFixes::playerLegendLine));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_LEVEL_TOO_MANY_PLAYERS)
 	public void keepFirstPlayer(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Keep only the first player",
-				"Replaces the extra players with a tile they can stand on.", null,
+		acceptor.accept(issue, Messages.get("fix.keepFirstPlayer"), null, null,
 				(IModification) context -> rewrite(issue, context, Level.class, QuickFixes::keepFirstPlayer));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_TEXTURE_SIZE)
 	public void fitTextureToSize(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Resize the texture", "Pads short rows with dots and deletes the extra ones.", null,
+		acceptor.accept(issue, Messages.get("fix.resizeTexture"), null, null,
 				(IModification) context -> rewrite(issue, context, Texture.class, QuickFixes::fitTexture));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_PALETTE_SIZE)
 	public void fitPaletteToRegister(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Resize the palette to 4 colors", "Deletes the extra colors or repeats the last one.", null,
+		acceptor.accept(issue, Messages.get("fix.resizePalette", Palettes.ENTRIES), null, null,
 				(IModification) context -> rewrite(issue, context, PaletteDef.class,
 						(host, text) -> QuickFixes.fitPalette(text)));
 	}
 
 	@Fix(GBSokobanValidator.ISSUE_PULL_WITHOUT_OBJECTS)
 	public void stopPulling(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Remove PLAYER_CAN_PULL", "Deletes it: nothing in this game can be pulled.", null,
+		acceptor.accept(issue, Messages.get("fix.removeCanPull"), null, null,
 				(IModification) context -> {
 					IXtextDocument doc = context.getXtextDocument();
 					deleteLineAt(doc, doc.get().indexOf("PLAYER_CAN_PULL"));
@@ -84,7 +85,7 @@ public class GBSokobanQuickfixProvider extends DefaultQuickfixProvider {
 
 	@Fix(GBSokobanValidator.ISSUE_SOUND_NEVER_PLAYS)
 	public void removeUnreachableSound(Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Remove the sound", "Deletes it: nothing in this game triggers this event.", null,
+		acceptor.accept(issue, Messages.get("fix.removeSound"), null, null,
 				(IModification) context -> deleteLineAt(context.getXtextDocument(), issue.getOffset()));
 	}
 

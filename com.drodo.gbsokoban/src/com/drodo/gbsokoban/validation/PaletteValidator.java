@@ -14,6 +14,7 @@ import com.drodo.gbsokoban.gBSokoban.Game;
 import com.drodo.gbsokoban.gBSokoban.PaletteDef;
 import com.drodo.gbsokoban.gBSokoban.Texture;
 import com.drodo.gbsokoban.model.GameTextures;
+import com.drodo.gbsokoban.util.Messages;
 import com.drodo.gbsokoban.util.Palettes;
 
 public class PaletteValidator extends AbstractDeclarativeValidator {
@@ -32,7 +33,7 @@ public class PaletteValidator extends AbstractDeclarativeValidator {
 				? palette.getShades().size()
 				: palette.getColors().size();
 		if (named != Palettes.ENTRIES)
-			error("A palette needs exactly " + Palettes.ENTRIES + " colors. This one has " + named,
+			error(Messages.get("palette.size", Palettes.ENTRIES),
 					GBSokobanPackage.Literals.PALETTE_DEF__NAME, GBSokobanValidator.ISSUE_PALETTE_SIZE);
 	}
 
@@ -42,7 +43,7 @@ public class PaletteValidator extends AbstractDeclarativeValidator {
 			return;
 		for (PaletteDef palette : game.getPalettes())
 			if (!palette.getColors().isEmpty())
-				warning("This game mixes DMG and RGB colors, so it is built for the Game Boy Color",
+				warning(Messages.get("palette.mixed"),
 						palette, GBSokobanPackage.Literals.PALETTE_DEF__NAME, -1);
 	}
 
@@ -77,23 +78,15 @@ public class PaletteValidator extends AbstractDeclarativeValidator {
 		int allowed = color ? Palettes.CGB_BKG_PALETTES : Palettes.DMG_BKG_PALETTES;
 		for (int i = allowed; i < background.size(); i++)
 			error(color
-					? "This game uses " + background.size() + " palettes for its tiles and objects. A "
-							+ "Game Boy Color allows " + Palettes.CGB_BKG_PALETTES
-					: "An original Game Boy allows " + Palettes.DMG_BKG_PALETTES + " palette for tiles "
-							+ "and objects and this game uses " + background.size()
-							+ ". Use '" + background.get(0).getName()
-							+ "' everywhere or make the game in color",
+					? Messages.get("palette.tooMany", Palettes.CGB_BKG_PALETTES)
+					: Messages.get("palette.dmgTooMany"),
 					background.get(i), GBSokobanPackage.Literals.PALETTE_DEF__NAME, INSIGNIFICANT_INDEX);
 
 		int allowedSprites = color ? Palettes.CGB_OBJECT_PALETTES : Palettes.DMG_OBJECT_PALETTES;
 		for (int i = allowedSprites; i < sprites.size(); i++)
 			error(color
-					? "This game uses " + sprites.size() + " palettes for the player and the moving "
-							+ "objects. A Game Boy Color allows " + Palettes.CGB_OBJECT_PALETTES
-					: "An original Game Boy allows " + Palettes.DMG_OBJECT_PALETTES + " palettes for the "
-							+ "player and the moving objects and this game uses " + sprites.size()
-							+ ". Use '" + sprites.get(0).getName() + "' or '" + sprites.get(1).getName()
-							+ "' or make the game in color",
+					? Messages.get("palette.tooMany", Palettes.CGB_OBJECT_PALETTES)
+					: Messages.get("palette.dmgTooMany"),
 					sprites.get(i), GBSokobanPackage.Literals.PALETTE_DEF__NAME, INSIGNIFICANT_INDEX);
 	}
 }

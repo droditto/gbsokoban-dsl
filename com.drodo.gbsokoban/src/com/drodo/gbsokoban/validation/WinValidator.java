@@ -24,6 +24,7 @@ import com.drodo.gbsokoban.gBSokoban.SomeOn;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
 import com.drodo.gbsokoban.gBSokoban.WinCondition;
 import com.drodo.gbsokoban.model.GoalTiles;
+import com.drodo.gbsokoban.util.Messages;
 
 public class WinValidator extends AbstractDeclarativeValidator {
 
@@ -39,12 +40,12 @@ public class WinValidator extends AbstractDeclarativeValidator {
 			Game game = EcoreUtil2.getContainerOfType(condition, Game.class);
 			if (game == null || GBSokobanValidator.destroysObjects(game))
 				return;
-			warning("Nothing in this game destroys objects, so this can never be met",
+			warning(Messages.get("win.noDestroyer"),
 					GBSokobanPackage.Literals.NO_ENTITY__ENTITY);
 		} else if (entity instanceof TileDef) {
 			TileDef tile = (TileDef) entity;
 			if (!(tile.getBehaviour() instanceof Crumble) && !(tile.getBehaviour() instanceof Fillable))
-				warning("This tile never disappears, so this can never be met",
+				warning(Messages.get("win.tileStays"),
 						GBSokobanPackage.Literals.NO_ENTITY__ENTITY);
 		}
 	}
@@ -57,7 +58,7 @@ public class WinValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkAllOnPlayerIsRedundant(AllOn condition) {
 		if (condition.getSubject() instanceof PlayerRef)
-			warning("There is only one player, so ALL and SOME are the same here. Write SOME",
+			warning(Messages.get("win.allPlayer"),
 					GBSokobanPackage.Literals.ALL_ON__SUBJECT);
 	}
 
@@ -71,8 +72,7 @@ public class WinValidator extends AbstractDeclarativeValidator {
 				continue;
 			ObjectDef owner = claimed.putIfAbsent(tile, object);
 			if (owner != null && owner != object)
-				error("'" + tile.getName() + "' already holds the goals of '" + owner.getName() + "'. Give '"
-						+ object.getName() + "' a tile of its own",
+				error(Messages.get("win.goalTaken", owner.getName()),
 						condition, tileFeature(condition), INSIGNIFICANT_INDEX);
 		}
 	}
@@ -92,8 +92,8 @@ public class WinValidator extends AbstractDeclarativeValidator {
 		if (tile == null)
 			return;
 		if (tile.getBehaviour() instanceof Solid)
-			warning("Objects cannot rest on a tile that blocks them, so this can never be met", feature);
+			warning(Messages.get("win.tileBlocks"), feature);
 		else if (tile.getBehaviour() instanceof Deadly || tile.getBehaviour() instanceof Fillable)
-			warning("This tile destroys objects instead of holding them, so this can never be met", feature);
+			warning(Messages.get("win.tileDestroys"), feature);
 	}
 }

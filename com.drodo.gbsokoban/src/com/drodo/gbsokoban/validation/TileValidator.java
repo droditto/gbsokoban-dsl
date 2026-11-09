@@ -16,6 +16,7 @@ import com.drodo.gbsokoban.gBSokoban.ObjectDef;
 import com.drodo.gbsokoban.gBSokoban.TileDef;
 import com.drodo.gbsokoban.gBSokoban.WinCondition;
 import com.drodo.gbsokoban.model.GoalTiles;
+import com.drodo.gbsokoban.util.Messages;
 
 public class TileValidator extends AbstractDeclarativeValidator {
 
@@ -27,14 +28,14 @@ public class TileValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkTileSymbolLength(TileDef tile) {
 		if (tile.getSymbol() != null && tile.getSymbol().length() != 1)
-			error("This must be exactly one character",
+			error(Messages.get("tile.symbolLength"),
 					tile, GBSokobanPackage.Literals.TILE_DEF__SYMBOL, -1, GBSokobanValidator.ISSUE_SYMBOL_LENGTH);
 	}
 
 	@Check
 	public void checkLegendSymbolLength(LegendEntry entry) {
 		if (entry.getSymbol() != null && entry.getSymbol().length() != 1)
-			error("This must be exactly one character",
+			error(Messages.get("tile.symbolLength"),
 					entry, GBSokobanPackage.Literals.LEGEND_ENTRY__SYMBOL, -1, GBSokobanValidator.ISSUE_SYMBOL_LENGTH);
 	}
 
@@ -46,8 +47,7 @@ public class TileValidator extends AbstractDeclarativeValidator {
 		if (game == null || GoalTiles.owners(game).containsValue(object)
 				|| GBSokobanValidator.hasUnresolvedReferences(game))
 			return;
-		warning("'" + object.getName() + "' has no goal to rest on, so this texture is never drawn. "
-				+ "Add a win condition, such as ALL " + object.getName() + " ON <tile>",
+		warning(Messages.get("tile.onGoalNoGoal"),
 				GBSokobanPackage.Literals.OBJECT_DEF__GOAL_TEXTURE);
 	}
 
@@ -56,7 +56,7 @@ public class TileValidator extends AbstractDeclarativeValidator {
 		for (TileDef tile : game.getTiles()) {
 			if (isReachable(tile, game))
 				continue;
-			warning("Nothing uses '" + tile.getName() + "'. Place it in a level or remove it",
+			warning(Messages.get("tile.unused"),
 					tile, GBSokobanPackage.Literals.ENTITY__NAME, -1);
 		}
 	}
@@ -89,8 +89,8 @@ public class TileValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkTileTransformNotIntoSelf(TileDef tile) {
 		if (tile.getBehaviour() instanceof Crumble && ((Crumble) tile.getBehaviour()).getTarget() == tile)
-			error("A tile cannot collapse into itself", GBSokobanPackage.Literals.TILE_DEF__BEHAVIOUR);
+			error(Messages.get("tile.intoSelf"), GBSokobanPackage.Literals.TILE_DEF__BEHAVIOUR);
 		if (tile.getBehaviour() instanceof Fillable && ((Fillable) tile.getBehaviour()).getTarget() == tile)
-			error("A tile cannot fill into itself", GBSokobanPackage.Literals.TILE_DEF__BEHAVIOUR);
+			error(Messages.get("tile.intoSelf"), GBSokobanPackage.Literals.TILE_DEF__BEHAVIOUR);
 	}
 }

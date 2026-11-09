@@ -21,6 +21,7 @@ import com.drodo.gbsokoban.model.GameTextures;
 import com.drodo.gbsokoban.model.SymbolPool;
 import com.drodo.gbsokoban.services.GBSokobanGrammarAccess;
 import com.drodo.gbsokoban.util.CellGeometry;
+import com.drodo.gbsokoban.util.Messages;
 import com.drodo.gbsokoban.util.Speeds;
 import com.google.inject.Inject;
 
@@ -60,12 +61,12 @@ public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvi
 		String name = model instanceof TileDef ? ((TileDef) model).getName() : "";
 		String free = SymbolPool.firstUnusedFor(name, SymbolPool.usedIn(game));
 		if (free != null)
-			propose("\"" + free + "\"", "\"" + free + "\" (not used yet)", context, acceptor);
+			propose("\"" + free + "\"", Messages.get("assist.freeSymbol"), context, acceptor);
 	}
 
 	private void proposeMoveSpeed(Game game, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
 		int speed = Speeds.defaultMoveSpeed(GameTextures.cellPx(game));
-		propose(String.valueOf(speed), speed + " (the default)", context, acceptor);
+		propose(String.valueOf(speed), Messages.get("assist.defaultSpeed"), context, acceptor);
 	}
 
 	private void proposeAnimSpeed(Game game, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
@@ -77,14 +78,14 @@ public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvi
 		int cellPx = GameTextures.cellPx(game);
 		int moveSpeed = game.getMoveSpeed() > 0 ? game.getMoveSpeed() : Speeds.defaultMoveSpeed(cellPx);
 		int derived = Speeds.animSpeedFor(frames, moveSpeed, cellPx);
-		propose(String.valueOf(derived), derived + " (matches MOVE_SPEED)", context, acceptor);
+		propose(String.valueOf(derived), Messages.get("assist.animSpeed"), context, acceptor);
 	}
 
 	private void proposeMirror(EObject model, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
 		if (!(model instanceof Animation) || ((Animation) model).getDirection() == null)
 			return;
 		String opposite = Directions.opposite(((Animation) model).getDirection()).getLiteral();
-		propose("MIRROR " + opposite, "MIRROR " + opposite + " (reuses " + opposite + ", flipped)", context, acceptor);
+		propose("MIRROR " + opposite, Messages.get("assist.mirror", opposite), context, acceptor);
 	}
 
 	private void proposeFirstSoundValue(EObject model, ContentAssistContext context,
@@ -93,11 +94,11 @@ public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvi
 			return;
 		SoundChannel channel = ((Sound) model).getChannel();
 		if (channel == SoundChannel.NR3)
-			propose("128", "128 (turns NR3 on)", context, acceptor);
+			propose("128", Messages.get("assist.waveOn"), context, acceptor);
 		else if (channel == SoundChannel.NR1)
-			propose("0", "0 (no frequency sweep)", context, acceptor);
+			propose("0", Messages.get("assist.noSweep"), context, acceptor);
 		else
-			propose("0", "0 (ignored by this channel)", context, acceptor);
+			propose("0", Messages.get("assist.ignored"), context, acceptor);
 	}
 
 	private void proposeGrids(EObject model, Game game, ContentAssistContext context,
@@ -119,12 +120,16 @@ public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvi
 				grid.append('\n');
 			grid.append('"').append(".".repeat(side)).append('"');
 		}
-		propose(grid.toString(), side + "x" + side + " grid (empty texture)", context, acceptor);
+		accept(getProposalCreator().createProposal(grid.toString(), context,
+				(e) -> e.setLabel(Messages.get("assist.grid", side))), acceptor);
 	}
 
-	private void propose(String text, String label, ContentAssistContext context,
+	private void propose(String text, String description, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
-		ContentAssistEntry entry = getProposalCreator().createProposal(text, context, (e) -> e.setLabel(label));
+		accept(getProposalCreator().createProposal(text, context, (e) -> e.setDescription(description)), acceptor);
+	}
+
+	private void accept(ContentAssistEntry entry, IIdeContentProposalAcceptor acceptor) {
 		if (entry != null)
 			acceptor.accept(entry, getProposalPriorities().getDefaultPriority(entry));
 	}

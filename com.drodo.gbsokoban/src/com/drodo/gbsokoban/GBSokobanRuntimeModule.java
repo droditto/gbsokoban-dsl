@@ -3,7 +3,12 @@
  */
 package com.drodo.gbsokoban;
 
+import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
+import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
+
 import com.drodo.gbsokoban.generator.BuildTrigger;
+import com.drodo.gbsokoban.validation.LinkingMessages;
+import com.drodo.gbsokoban.validation.SyntaxMessages;
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -12,5 +17,13 @@ public class GBSokobanRuntimeModule extends AbstractGBSokobanRuntimeModule {
 
 	public Class<? extends BuildTrigger> bindBuildTrigger() {
 		return BuildTrigger.None.class;
+	}
+
+	public Class<? extends ISyntaxErrorMessageProvider> bindISyntaxErrorMessageProvider() {
+		return SyntaxMessages.class;
+	}
+
+	public Class<? extends ILinkingDiagnosticMessageProvider> bindILinkingDiagnosticMessageProvider() {
+		return LinkingMessages.class;
 	}
 }

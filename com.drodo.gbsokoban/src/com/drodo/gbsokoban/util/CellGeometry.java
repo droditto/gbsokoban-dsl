@@ -41,16 +41,6 @@ public record CellGeometry(int px) {
 		return nearest;
 	}
 
-	public static String supportedPxAsText() {
-		StringBuilder out = new StringBuilder();
-		for (int px : SUPPORTED_PX) {
-			if (out.length() > 0)
-				out.append(" or ");
-			out.append(px);
-		}
-		return out.toString();
-	}
-
 	/** 8x16 mode pairs tiles by index, so a 16px cell must use the taller sprite. */
 	public boolean usesTallSprites() {
 		return px == 16;
