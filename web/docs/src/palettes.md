@@ -7,8 +7,8 @@ Después de todos los ajustes del inicio del código comienza el bloque de palet
 PALETTES
 =========
 
-background DMG_WHITE DMG_LITE_GRAY DMG_DARK_GRAY DMG_BLACK
-player     DMG_WHITE DMG_WHITE DMG_LITE_GRAY DMG_BLACK
+paleta_fondo DMG_WHITE DMG_LITE_GRAY DMG_DARK_GRAY DMG_BLACK
+paleta_jugador DMG_WHITE DMG_WHITE DMG_LITE_GRAY DMG_BLACK
 ```
 
 Puedes generar el juego para la Game Boy original, usando solo los colores DMG, o para la Game Boy Color, usando los colores RGB.
@@ -17,19 +17,19 @@ Puedes generar el juego para la Game Boy original, usando solo los colores DMG, 
 
 ## Game Boy original
 
-Con los colores DMG se genera una ROM `.gb`. Son los cuatro tonos de gris de la consola.
+Con los colores DMG se genera un archivo ROM `.gb`. Los cuatro tonos de gris de la consola son:
 
 <table>
 <tr><td><span class="swatch" style="background:#ffffff"></span> <code>DMG_WHITE</code></td><td><span class="swatch" style="background:#a9a9a9"></span> <code>DMG_LITE_GRAY</code></td><td><span class="swatch" style="background:#545454"></span> <code>DMG_DARK_GRAY</code></td><td><span class="swatch" style="background:#000000"></span> <code>DMG_BLACK</code></td></tr>
 </table>
 
-Al generar una ROM `.gb` puedes utilizar hasta tres paletas, una para el fondo y dos para los sprites. A continuación puedes ver un ejemplo de cómo se definirían paletas de grises.
+Al generar un archivo ROM `.gb`, solo se pueden utilizar unas pocas paletas y el editor te avisará si te pasas. A continuación se puede ver un ejemplo de cómo se definirían paletas de grises.
 
 <img srcset="shots/palettes-dmg.png 2x">
 
 ## Game Boy Color
 
-Con los colores que empiezan por `RGB_` se genera una ROM `.gbc`.
+Con los colores que empiezan por `RGB_` se genera un archivo ROM `.gbc`.
 
 <table>
 <tr><td><span class="swatch" style="background:#ff0000"></span> <code>RGB_RED</code></td><td><span class="swatch" style="background:#7b0000"></span> <code>RGB_DARKRED</code></td><td><span class="swatch" style="background:#00ff00"></span> <code>RGB_GREEN</code></td><td><span class="swatch" style="background:#007b00"></span> <code>RGB_DARKGREEN</code></td></tr>
@@ -39,6 +39,6 @@ Con los colores que empiezan por `RGB_` se genera una ROM `.gbc`.
 <tr><td><span class="swatch" style="background:#f7a57b"></span> <code>RGB_LIGHTFLESH</code></td><td><span class="swatch" style="background:#525200"></span> <code>RGB_BROWN</code></td><td><span class="swatch" style="background:#f7a500"></span> <code>RGB_ORANGE</code></td><td><span class="swatch" style="background:#7b7b00"></span> <code>RGB_TEAL</code></td></tr>
 </table>
 
-Además de estos colores, también puedes utilizar códigos hexadecimales, como por ejemplo `#C0563C`. Pero ten cuidado, porque la pantalla de la consola no siempre será capaz de reproducir los mismos colores que ves en el navegador. Se pueden utilizar hasta ocho paletas para el fondo y ocho para los sprites. A continuación puedes ver un ejemplo de cómo se definirían paletas de colores.
+Además de estos colores, también se pueden utilizar códigos hexadecimales, como por ejemplo `#C0563C`. Pero cuidado, porque la pantalla de la consola no siempre será capaz de reproducir los mismos colores que ves en el navegador. Con estos colores se pueden utilizar muchas más paletas, aunque también hay un límite y el editor te avisará si te pasas. A continuación se puede ver un ejemplo de cómo se definirían paletas de colores.
 
 <img srcset="shots/palettes.png 2x">

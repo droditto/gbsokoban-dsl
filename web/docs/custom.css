@@ -48,8 +48,8 @@ h1, h2, h3, h4 { font-weight: 600; }
 	text-transform: uppercase;
 }
 
-.assist-box { border-color: #3a6fc4; }
-.assist-box .box-title { color: #3a6fc4; }
+.assist-box { border-color: #61afef; }
+.assist-box .box-title { color: #61afef; }
 
 .fix-box { border-color: #f0b400; }
 .fix-box .box-title { color: #f0b400; }

@@ -5,15 +5,15 @@
 # La gramática
 
 - [Ajustes](prelude.md)
-- [Paletas](palettes.md)
-- [Texturas](textures.md)
-- [Baldosas](tiles.md)
-- [Objetos](objects.md)
-- [Jugador](player.md)
-- [Leyenda](legend.md)
-- [Condiciones de victoria](win.md)
-- [Sonidos](sounds.md)
-- [Niveles](levels.md)
+- [Paletas (PALETTES)](palettes.md)
+- [Texturas (TEXTURES)](textures.md)
+- [Baldosas (TILES)](tiles.md)
+- [Objetos (OBJECTS)](objects.md)
+- [Jugador (PLAYER)](player.md)
+- [Leyenda (LEGEND)](legend.md)
+- [Condiciones de victoria (WIN)](win.md)
+- [Sonidos (SOUNDS)](sounds.md)
+- [Niveles (LEVELS)](levels.md)
 
 # El emulador
 

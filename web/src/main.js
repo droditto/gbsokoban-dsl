@@ -13,7 +13,6 @@ import './style.css';
 
 const consent = document.querySelector('#consent');
 const welcome = document.querySelector('#welcome');
-const lost = document.querySelector('#lost');
 const study = document.querySelectorAll('.study');
 const status = document.querySelector('#status');
 const screen = document.querySelector('#screen');
@@ -28,6 +27,8 @@ let romName;
 let joining = null;
 
 const UNREACHABLE = 'No se ha podido conectar al servidor. Recarga la página.';
+const RETRY_MS = 5_000;
+const RELOAD_GAP_MS = 30_000;
 
 const opened = fetch('/api/session').then((response) => response.json());
 const post = (path, body) =>
@@ -72,10 +73,20 @@ async function start() {
 			transport
 		});
 		transport.onClose(() => {
-			if (client.ready) view.dispatch({ effects: server.reconfigure(connect()) });
+			if (client.ready) setTimeout(() => view.dispatch({ effects: server.reconfigure(connect()) }), RETRY_MS);
 		});
-		client.initializePromise.catch(() => lost.showModal());
+		client.initializePromise.catch(recover);
 		return languageServerWithClient({ client, documentUri: session.documentUri, languageId: 'gbsoko' });
+	}
+
+	async function recover() {
+		const reachable = await fetch('/', { method: 'HEAD', cache: 'no-store' }).then((response) => response.ok, () => false);
+		if (reachable && Date.now() - Number(sessionStorage.getItem('reloaded')) > RELOAD_GAP_MS) {
+			sessionStorage.setItem('reloaded', Date.now());
+			window.removeEventListener('beforeunload', confirmLeaving);
+			location.reload();
+		} else
+			setTimeout(() => view.dispatch({ effects: server.reconfigure(connect()) }), RETRY_MS);
 	}
 
 	const view = new EditorView({
@@ -167,10 +178,15 @@ function confirmLeaving(event) {
 	event.returnValue = true;
 }
 
-lost.addEventListener('close', () => {
-	window.removeEventListener('beforeunload', confirmLeaving);
-	location.reload();
-});
+for (const link of document.querySelectorAll('a[target^="gbsoko-"]'))
+	link.addEventListener('click', (event) => {
+		if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+		const tab = window.open('', link.target);
+		if (!tab) return;
+		event.preventDefault();
+		if (!tab.location.pathname.startsWith(new URL(link.href).pathname)) tab.location.href = link.href;
+		tab.focus();
+	});
 
 consent.addEventListener('close', () => {
 	if (consent.returnValue !== 'yes' && consent.returnValue !== 'no') return consent.showModal();

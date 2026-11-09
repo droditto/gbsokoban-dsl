@@ -1,6 +1,6 @@
 # Ajustes
 
-Al principio del código es donde se definen los ajustes del juego. Son opcionales, pero rellenarlos te permite añadir una pantalla de título, una pantalla de fin, cambiar las velocidades, permitir que el jugador tire de los objetos o quitar el selector de niveles.
+Al principio del código es donde se definen los ajustes del juego. Son opcionales, pero rellenarlos permitirá añadir una pantalla de título y una pantalla de fin, cambiar las velocidades, dejar que el jugador tire de los objetos además de empujarlos o quitar el selector de niveles para obligar a jugarlos en orden.
 
 ```gbsoko
 TITLE "SOKOBAN"

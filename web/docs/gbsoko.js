@@ -20,3 +20,10 @@ hljs.registerLanguage('gbsoko', () => ({
 document.querySelectorAll('code.language-gbsoko').forEach((block) => {
 	block.innerHTML = hljs.highlight('gbsoko', block.textContent).value;
 });
+
+document.addEventListener('click', (event) => {
+	const link = event.target.closest('a[href]');
+	if (!link || link.origin !== location.origin) return;
+	const toTask = link.pathname.endsWith('/tarea.html');
+	if (toTask !== location.pathname.endsWith('/tarea.html')) link.target = toTask ? 'gbsoko-tarea' : 'gbsoko-docs';
+});
