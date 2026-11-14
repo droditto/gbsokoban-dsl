@@ -9,8 +9,8 @@ Para declarar un objeto escribe el nombre que le quieres dar, seguido de la pala
 OBJECTS
 ========
 
-caja USES arte_caja ON_GOAL arte_caja_colocada
-caja_azul USES arte_caja_azul ON_GOAL arte_caja_azul_colocada
+caja USES textura_caja ON_GOAL textura_caja_colocada
+caja_azul USES textura_caja_azul ON_GOAL textura_caja_azul_colocada
 ```
 
 Puedes tener varios objetos, cada uno con su casilla objetivo correspondiente, y utilizarlos como condición de victoria. Por ejemplo, que todas las cajas naranjas tengan que ir a la casilla objetivo naranja y todas las azules a la azul.

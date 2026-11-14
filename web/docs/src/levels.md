@@ -45,9 +45,9 @@ Los caracteres `#`, el espacio y `.` son los de las baldosas de la pared, el sue
 TILES
 ======
 
-suelo " " USES arte_suelo
-pared "#" USES arte_pared BLOCKS
-objetivo "." USES arte_objetivo
+suelo " " USES textura_suelo
+pared "#" USES textura_pared BLOCKS
+objetivo "." USES textura_objetivo
 ```
 
 Los caracteres `@`, `+`, `$` y `*` son los de la leyenda, que colocan al jugador y a la caja sobre el suelo o sobre la casilla objetivo.

@@ -1,6 +1,6 @@
-TITLE "SOKOBAN"
-AUTHOR "TU NOMBRE"
-ENDING "YOU WIN\nSEE YOU AGAIN"
+TITLE "MI JUEGO"
+AUTHOR "AUTOR"
+ENDING "HAS SUPERADO TODOS LOS PUZLES"
 
 =========
 PALETTES
@@ -15,7 +15,7 @@ paleta_azules RGB_WHITE #F5D76E #3A6EA5 RGB_BLACK
 TEXTURES
 =========
 
-arte_suelo USES paleta_grises
+textura_suelo USES paleta_grises
 "00000000"
 "00000000"
 "00000000"
@@ -25,7 +25,7 @@ arte_suelo USES paleta_grises
 "00000000"
 "00000000"
 
-arte_pared USES paleta_rojos
+textura_pared USES paleta_rojos
 "21112111"
 "32223222"
 "11211121"
@@ -35,7 +35,7 @@ arte_pared USES paleta_rojos
 "11211121"
 "22322232"
 
-arte_objetivo USES paleta_grises
+textura_objetivo USES paleta_grises
 "00000000"
 "00000000"
 "00000000"
@@ -45,7 +45,7 @@ arte_objetivo USES paleta_grises
 "00000000"
 "00000000"
 
-arte_caja USES paleta_naranjas
+textura_caja USES paleta_naranjas
 "31111113"
 "13333331"
 "13100101"
@@ -55,7 +55,7 @@ arte_caja USES paleta_naranjas
 "10000001"
 "21111112"
 
-arte_caja_colocada USES paleta_azules
+textura_caja_colocada USES paleta_azules
 "32222223"
 "23333332"
 "23211212"
@@ -109,15 +109,15 @@ walk_up_2 USES paleta_azules
 TILES
 ======
 
-suelo " " USES arte_suelo
-pared "#" USES arte_pared BLOCKS
-objetivo "." USES arte_objetivo
+suelo " " USES textura_suelo
+pared "#" USES textura_pared BLOCKS
+objetivo "." USES textura_objetivo
 
 ========
 OBJECTS
 ========
 
-caja USES arte_caja ON_GOAL arte_caja_colocada
+caja USES textura_caja ON_GOAL textura_caja_colocada
 
 =======
 PLAYER

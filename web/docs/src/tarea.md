@@ -37,8 +37,8 @@ Puedes consultar las páginas [Texturas](textures.md) y [Jugador](player.md).
 En esta fase tendrás que añadir una caja verde con su propia casilla objetivo, también verde, de forma que cada caja tenga que llegar a la casilla objetivo de su color. Igual que la caja naranja se vuelve azul al llegar a su casilla objetivo, la caja verde se volverá morada al llegar a la suya.
 
 1. En el bloque `PALETTES`, añade `paleta_verdes` y `paleta_morados`, que tienes en el anexo.
-2. En el bloque `TEXTURES`, cambia `arte_objetivo`, la textura de la casilla objetivo que ya existe, para que su punto sea naranja, con `paleta_naranjas`.
-3. En el mismo bloque, crea tres texturas nuevas, copias de `arte_caja`, `arte_caja_colocada` y `arte_objetivo` con otra paleta. La caja verde y la nueva casilla objetivo usan `paleta_verdes` y la caja verde sobre su casilla objetivo usa `paleta_morados`.
+2. En el bloque `TEXTURES`, cambia `textura_objetivo`, la textura de la casilla objetivo que ya existe, para que su punto sea naranja, con `paleta_naranjas`.
+3. En el mismo bloque, crea tres texturas nuevas, copias de `textura_caja`, `textura_caja_colocada` y `textura_objetivo` con otra paleta. La caja verde y la nueva casilla objetivo usan `paleta_verdes` y la caja verde sobre su casilla objetivo usa `paleta_morados`.
 4. En el bloque `TILES`, crea la baldosa de la nueva casilla objetivo, con su textura.
 5. En el bloque `OBJECTS`, crea el objeto de la caja verde, con su textura normal y la que usa sobre su casilla objetivo.
 6. En el bloque `LEGEND`, añade un carácter que represente la caja verde sobre el suelo, para poder colocarla en los niveles.
@@ -54,10 +54,10 @@ Puedes consultar las páginas [Paletas](palettes.md), [Texturas](textures.md), [
 
 En esta fase tendrás que añadir tres baldosas nuevas y un nivel que las use.
 
-1. En el bloque `TEXTURES`, añade las texturas `arte_grieta`, `arte_pozo` y `arte_salida` que tienes en el anexo.
-2. En el bloque `TILES`, crea una baldosa para cada textura. La de `arte_grieta` se transforma en la de `arte_pozo` cuando el jugador sale de ella. Si el jugador entra en la de `arte_pozo`, muere y el nivel se reinicia. La de `arte_salida` es la salida y no necesita ningún comportamiento especial.
-3. En el bloque `WIN`, añade dos condiciones, que no quede ninguna baldosa de `arte_grieta` y que el jugador esté en la salida. Los niveles anteriores seguirán funcionando, porque no usan esas baldosas.
-4. En el bloque `LEVELS`, añade un nivel nuevo al final, en el que el jugador tenga que pisar todas las baldosas de `arte_grieta` antes de llegar a la salida.
+1. En el bloque `TEXTURES`, añade las texturas `textura_grieta`, `textura_pozo` y `textura_salida` que tienes en el anexo.
+2. En el bloque `TILES`, crea una baldosa para cada textura. La de `textura_grieta` se transforma en la de `textura_pozo` cuando el jugador sale de ella. Si el jugador entra en la de `textura_pozo`, muere y el nivel se reinicia. La de `textura_salida` es la salida y no necesita ningún comportamiento especial.
+3. En el bloque `WIN`, añade dos condiciones, que no quede ninguna baldosa de `textura_grieta` y que el jugador esté en la salida. Los niveles anteriores seguirán funcionando, porque no usan esas baldosas.
+4. En el bloque `LEVELS`, añade un nivel nuevo al final, en el que el jugador tenga que pisar todas las baldosas de `textura_grieta` antes de llegar a la salida.
 5. Compila tu juego y comprueba que se ve como en la imagen de abajo.
 
 Puedes consultar las páginas [Texturas](textures.md), [Baldosas](tiles.md), [Condiciones de victoria](win.md) y [Niveles](levels.md).
@@ -128,7 +128,7 @@ paleta_morados RGB_WHITE #F5D76E #6E4FA5 RGB_BLACK
 ### Fase 4
 
 ```gbsoko
-arte_grieta USES paleta_grises
+textura_grieta USES paleta_grises
 "01110000"
 "10000020"
 "00022220"
@@ -138,7 +138,7 @@ arte_grieta USES paleta_grises
 "01002110"
 "00010000"
 
-arte_pozo USES paleta_grises
+textura_pozo USES paleta_grises
 "33333333"
 "33333333"
 "33333333"
@@ -148,7 +148,7 @@ arte_pozo USES paleta_grises
 "33333333"
 "33333333"
 
-arte_salida USES paleta_rojos
+textura_salida USES paleta_rojos
 "22222333"
 "21133313"
 "23331313"

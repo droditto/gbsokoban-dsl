@@ -3,11 +3,11 @@
 Al principio del código es donde se definen los ajustes del juego. Son opcionales, pero rellenarlos permitirá añadir una pantalla de título y una pantalla de fin, cambiar las velocidades, dejar que el jugador tire de los objetos además de empujarlos o quitar el selector de niveles para obligar a jugarlos en orden.
 
 ```gbsoko
-TITLE "SOKOBAN"
-AUTHOR "TU NOMBRE"
+TITLE "MI JUEGO"
+AUTHOR "AUTOR"
 MOVE_SPEED 8
 ANIM_SPEED 4
-ENDING "YOU WIN\nSEE YOU AGAIN"
+ENDING "HAS SUPERADO TODOS LOS PUZLES"
 PLAYER_CAN_PULL
 NO_LEVEL_SELECT
 ```

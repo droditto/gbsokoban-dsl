@@ -89,6 +89,7 @@ async function start() {
 			setTimeout(() => view.dispatch({ effects: server.reconfigure(connect()) }), RETRY_MS);
 	}
 
+	if (sessionStorage.getItem('source')) window.addEventListener('beforeunload', confirmLeaving);
 	const view = new EditorView({
 		state: EditorState.create({
 			doc: sessionStorage.getItem('source') ?? (await readFromUrl()) ?? session.source,
@@ -102,7 +103,10 @@ async function start() {
 				// On document.body, so tooltips on the first line are not clipped.
 				tooltips({ position: 'fixed', parent: document.body }),
 				EditorView.updateListener.of((update) => {
-					if (update.docChanged) sessionStorage.setItem('source', update.state.doc.toString());
+					if (update.docChanged) {
+						sessionStorage.setItem('source', update.state.doc.toString());
+						window.addEventListener('beforeunload', confirmLeaving);
+					}
 					for (const transaction of update.transactions)
 						if (transaction.isUserEvent('input.complete'))
 							transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => track('completion', text.line(1).text));
@@ -184,7 +188,13 @@ for (const link of document.querySelectorAll('a[target^="gbsoko-"]'))
 		const tab = window.open('', link.target);
 		if (!tab) return;
 		event.preventDefault();
-		if (!tab.location.pathname.startsWith(new URL(link.href).pathname)) tab.location.href = link.href;
+		let there = '';
+		try {
+			there = tab.location.pathname;
+		} catch {
+			// The tab is on another site, which can only be navigated away from.
+		}
+		if (!there.startsWith(new URL(link.href).pathname)) tab.location.href = link.href;
 		tab.focus();
 	});
 
