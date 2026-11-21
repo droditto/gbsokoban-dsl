@@ -1,6 +1,6 @@
 # Paletas
 
-Después de todos los ajustes del inicio del código comienza el bloque de paletas. Es un bloque obligatorio, ya que se necesita al menos una paleta para poder pintar las texturas del juego. Se declara con la palabra clave `PALETTES` y, a continuación, se define cada paleta con el nombre con el que te referirás a ella, seguido de los cuatro colores que la componen.
+Después de todos los ajustes del inicio del código, comienza el bloque de paletas. Es un bloque obligatorio, ya que se necesita al menos una paleta para poder pintar las texturas del juego. Se declara con la palabra clave `PALETTES` y, a continuación, se define cada paleta con el nombre con el que te referirás a ella, seguido de los cuatro colores que la componen.
 
 ```gbsoko
 =========

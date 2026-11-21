@@ -1,7 +1,7 @@
 package com.drodo.gbsokoban.validation;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
@@ -31,7 +31,7 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 		for (Animation anim : player.getAnims())
 			if (anim.getKind() == AnimKind.WALK)
 				return;
-		error(Messages.get("player.noWalk"), player, GBSokobanPackage.Literals.PLAYER__ANIMS, -1);
+		error(Messages.get("player.noWalk"), player, GBSokobanPackage.Literals.PLAYER__ANIMS, 0);
 	}
 
 	@Check
@@ -60,19 +60,16 @@ public class PlayerValidator extends AbstractDeclarativeValidator {
 	 */
 	@Check
 	public void checkEveryDirectionReachesFrames(Player player) {
-		Set<AnimKind> declared = new LinkedHashSet<>();
+		Map<AnimKind, Animation> declared = new LinkedHashMap<>();
 		for (Animation anim : player.getAnims())
-			declared.add(anim.getKind());
-		for (AnimKind kind : declared)
+			declared.putIfAbsent(anim.getKind(), anim);
+		for (AnimKind kind : declared.keySet())
 			for (Direction direction : Direction.values()) {
 				if (AnimationChain.follow(player, kind, direction).source() != null)
 					continue;
 				String message = Messages.get("player.noFrames", kind.getLiteral() + " " + direction.getLiteral());
 				Animation anim = declarationOf(player, kind, direction);
-				if (anim == null)
-					error(message, player, GBSokobanPackage.Literals.PLAYER__ANIMS, -1);
-				else
-					error(message, anim, GBSokobanPackage.Literals.ANIMATION__MIRROR, -1);
+				error(message, anim != null ? anim : declared.get(kind), GBSokobanPackage.Literals.ANIMATION__KIND, -1);
 			}
 	}
 

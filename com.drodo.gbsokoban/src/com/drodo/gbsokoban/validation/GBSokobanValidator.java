@@ -37,7 +37,8 @@ public class GBSokobanValidator extends AbstractGBSokobanValidator {
 		return false;
 	}
 
-	static boolean hasUnresolvedReferences(Game game) {
-		return !EcoreUtil.UnresolvedProxyCrossReferencer.find(game).isEmpty();
+	static boolean isIncomplete(Game game) {
+		return !game.eResource().getErrors().isEmpty()
+				|| !EcoreUtil.UnresolvedProxyCrossReferencer.find(game).isEmpty();
 	}
 }

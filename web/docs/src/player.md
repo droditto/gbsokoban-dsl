@@ -22,7 +22,7 @@ PUSH DOWN MIRROR UP
 
 Todas las animaciones deben tener el mismo número de fotogramas, por lo que si para alguna animación tienes menos texturas que para otra, se recomienda repetir la misma textura.
 
-Para optimizar la memoria de vídeo, lo habitual es reutilizar la animación de la dirección contraria dada la vuelta, escribiendo `MIRROR` seguido de esa dirección. Es opcional, pero así no hay que definir sus texturas de nuevo en el bloque de texturas. `LEFT` y `RIGHT` se dan la vuelta en horizontal y `UP` y `DOWN` en vertical.
+Para optimizar la memoria de vídeo, lo habitual es reutilizar la animación de la dirección contraria dada la vuelta, escribiendo `MIRROR` seguido de esa dirección. Es opcional, pero así no hay que definir sus texturas de nuevo en el bloque de texturas. `LEFT` y `RIGHT` se dan la vuelta en horizontal, y `UP` y `DOWN` en vertical.
 
 <div class="box assist-box">
 <p class="box-title">Content assist</p>

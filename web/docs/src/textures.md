@@ -29,7 +29,7 @@ En las baldosas, el color `0` de su paleta se puede utilizar sin ninguna preocup
 
 ## Objetos
 
-Un objeto quieto se dibuja como una baldosa más, con todos sus colores, pero mientras se mueve el color `0` de su paleta se vuelve transparente. Por eso hay que tener cuidado al utilizar el color `0` en las texturas de los objetos.
+Un objeto quieto se dibuja como una baldosa más, con todos sus colores, pero el color `0` de su paleta se vuelve transparente mientras se mueve. Por eso hay que tener cuidado al utilizar el color `0` en las texturas de los objetos.
 
 Es buena idea que el color `0` de la paleta de los objetos coincida con el color de las baldosas por las que se mueven. En el ejemplo, la paleta de la caja empieza por `RGB_WHITE`, igual que el suelo.
 

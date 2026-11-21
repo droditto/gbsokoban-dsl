@@ -133,9 +133,7 @@ LEGEND
 =======
 
 "@" = PLAYER ON suelo
-"+" = PLAYER ON objetivo
 "$" = caja ON suelo
-"*" = caja ON objetivo
 
 ====
 WIN

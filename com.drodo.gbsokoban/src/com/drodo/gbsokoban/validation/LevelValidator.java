@@ -222,7 +222,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 	public void checkLevelIsPlayable(Level level) {
 		Game game = EcoreUtil2.getContainerOfType(level, Game.class);
 		if (game == null || game.getWin().isEmpty() || game.getTiles().isEmpty()
-				|| GBSokobanValidator.hasUnresolvedReferences(game))
+				|| GBSokobanValidator.isIncomplete(game))
 			return;
 		LevelGrid grid = gridOf(game, level);
 		Set<TileDef> present = new HashSet<>();
@@ -242,7 +242,7 @@ public class LevelValidator extends AbstractDeclarativeValidator {
 	@Check
 	public void checkLevelHasEnoughObjects(Level level) {
 		Game game = EcoreUtil2.getContainerOfType(level, Game.class);
-		if (game == null || game.getTiles().isEmpty() || GBSokobanValidator.hasUnresolvedReferences(game))
+		if (game == null || game.getTiles().isEmpty() || GBSokobanValidator.isIncomplete(game))
 			return;
 		LevelGrid grid = gridOf(game, level);
 		Map<TileDef, ObjectDef> owners = GoalTiles.owners(game);

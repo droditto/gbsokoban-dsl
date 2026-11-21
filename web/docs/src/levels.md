@@ -6,7 +6,7 @@ Un nivel tiene que tener un único jugador y las cadenas que lo componen pueden 
 
 <img srcset="shots/levels.gif 2x">
 
-Los niveles se jugarán en el orden en el que los declares. Como ya se mencionaba en [Texturas](textures.md), si tus texturas son de 8×8 píxeles el nivel podrá ser de hasta 32×32 casillas, y si son de 16×16 píxeles, de hasta 16×16. En caso de que el nivel sea más grande que la pantalla, la cámara te seguirá a lo largo del nivel.
+Los niveles se jugarán en el orden en el que los declares. Como ya se mencionaba en [Texturas](textures.md), si tus texturas son de 8×8 píxeles, el nivel podrá ser de hasta 32×32 casillas, y si son de 16×16 píxeles, de hasta 16×16. En caso de que el nivel sea más grande que la pantalla, la cámara te seguirá a lo largo del nivel.
 
 A continuación se muestra el código de los dos niveles anteriores.
 
@@ -50,7 +50,7 @@ pared "#" USES textura_pared BLOCKS
 objetivo "." USES textura_objetivo
 ```
 
-Los caracteres `@`, `+`, `$` y `*` son los de la leyenda, que colocan al jugador y a la caja sobre el suelo o sobre la casilla objetivo.
+Los caracteres `@` y `$` son los de la leyenda, que colocan al jugador y a la caja sobre el suelo.
 
 ```gbsoko
 =======
@@ -58,7 +58,5 @@ LEGEND
 =======
 
 "@" = PLAYER ON suelo
-"+" = PLAYER ON objetivo
 "$" = caja ON suelo
-"*" = caja ON objetivo
 ```

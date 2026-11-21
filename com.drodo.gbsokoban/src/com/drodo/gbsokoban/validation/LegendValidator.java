@@ -24,6 +24,8 @@ public class LegendValidator extends AbstractDeclarativeValidator {
 
 	@Check
 	public void checkLegendHasPlayer(Game game) {
+		if (GBSokobanValidator.isIncomplete(game))
+			return;
 		for (LegendEntry entry : game.getLegend())
 			if (entry.getSubject() instanceof PlayerRef)
 				return;
@@ -53,6 +55,8 @@ public class LegendValidator extends AbstractDeclarativeValidator {
 
 	@Check
 	public void checkEveryObjectIsPlaced(Game game) {
+		if (GBSokobanValidator.isIncomplete(game))
+			return;
 		for (ObjectDef object : game.getObjects()) {
 			boolean placed = false;
 			for (LegendEntry entry : game.getLegend())

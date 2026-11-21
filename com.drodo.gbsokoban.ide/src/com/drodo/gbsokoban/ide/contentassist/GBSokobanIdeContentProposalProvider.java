@@ -28,6 +28,8 @@ import com.google.inject.Inject;
 /** The same proposals as the Eclipse provider, for the language server. */
 public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvider {
 
+	private static final int CONTEXT_PRIORITY = 600;
+
 	@Inject
 	private GBSokobanGrammarAccess grammar;
 
@@ -131,6 +133,6 @@ public class GBSokobanIdeContentProposalProvider extends IdeContentProposalProvi
 
 	private void accept(ContentAssistEntry entry, IIdeContentProposalAcceptor acceptor) {
 		if (entry != null)
-			acceptor.accept(entry, getProposalPriorities().getDefaultPriority(entry));
+			acceptor.accept(entry, CONTEXT_PRIORITY);
 	}
 }

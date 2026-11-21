@@ -45,7 +45,7 @@ public class TileValidator extends AbstractDeclarativeValidator {
 			return;
 		Game game = EcoreUtil2.getContainerOfType(object, Game.class);
 		if (game == null || GoalTiles.owners(game).containsValue(object)
-				|| GBSokobanValidator.hasUnresolvedReferences(game))
+				|| GBSokobanValidator.isIncomplete(game))
 			return;
 		warning(Messages.get("tile.onGoalNoGoal"),
 				GBSokobanPackage.Literals.OBJECT_DEF__GOAL_TEXTURE);
@@ -53,6 +53,8 @@ public class TileValidator extends AbstractDeclarativeValidator {
 
 	@Check
 	public void checkTileIsUsed(Game game) {
+		if (GBSokobanValidator.isIncomplete(game))
+			return;
 		for (TileDef tile : game.getTiles()) {
 			if (isReachable(tile, game))
 				continue;
